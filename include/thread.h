@@ -98,13 +98,6 @@ protected:
     static void implicit_exit();
 
     static void dispatch(Thread * prev, Thread * next) {
-        //assert(_ready.size() <= 1 || next != _idle);
-        if(_ready.size() > 1 && next == _idle){
-            db<Thread>(TRC) << "ERRO!!! ISSO NAO DEVERIA TER ACONTECIDO" << endl;            
-        } else {
-            db<Thread>(TRC) << "Tamanho da fila _ready: " << _ready.size() << endl;            
-        }
-
         if(prev != next) {
             db<Thread>(TRC) << "Thread::dispatch(prev=" << prev << ",next=" << next << ")" << endl;
             db<Thread>(INF) << "prev={" << prev << ",ctx=" << *prev->_context << "}" << endl;
@@ -124,13 +117,13 @@ protected:
     Context * volatile _context;
     volatile State _state;
     Queue * _waiting;
+    Thread * volatile _joining;
     Queue::Element _link;
 
     static Scheduler_Timer * _timer;
 
 private:
     static Thread * volatile _running;
-    static Thread * _idle;
     static Queue _ready;
     static Queue _suspended;
 };
@@ -138,7 +131,7 @@ private:
 
 template<typename ... Tn>
 inline Thread::Thread(int (* entry)(Tn ...), Tn ... an)
-: _state(READY), _waiting(0), _link(this, NORMAL)
+: _state(READY), _waiting(0), _joining(0), _link(this, NORMAL)
 {
     lock();
     _stack = reinterpret_cast<char *>(kmalloc(STACK_SIZE));
@@ -148,10 +141,10 @@ inline Thread::Thread(int (* entry)(Tn ...), Tn ... an)
 
 template<typename ... Cn, typename ... Tn>
 inline Thread::Thread(const Configuration & conf, int (* entry)(Tn ...), Tn ... an)
-: _state(conf.state), _waiting(0), _link(this, conf.priority)
+: _state(conf.state), _waiting(0), _joining(0), _link(this, conf.priority)
 {
     lock();
-    _stack = reinterpret_cast<char *>(kmalloc(STACK_SIZE));
+    _stack = reinterpret_cast<char *>(kmalloc(conf.stack_size));
     _context = CPU::init_stack(_stack, conf.stack_size, &implicit_exit, entry, an ...);
     constructor(entry, conf.stack_size); // implicit unlock
 }

@@ -9,11 +9,9 @@ extern "C" { void __epos_app_entry(); }
 
 __BEGIN_SYS
 
-Thread * Thread::_idle;
-
 void Thread::init()
 {
-	unsigned int IDLE_PRIORITY = (unsigned int)(-1);
+	unsigned int IDLE_PRIORITY = (unsigned int)(-1); // Prioridade minima
 
     int (* entry)() = reinterpret_cast<int (*)()>(__epos_app_entry);
 
@@ -21,7 +19,7 @@ void Thread::init()
 
     _running = new (kmalloc(sizeof(Thread))) Thread(Configuration(RUNNING, NORMAL), entry);
 
-    _idle = new (kmalloc(sizeof(Thread))) Thread(Configuration(READY, IDLE_PRIORITY), &idle);
+    new (kmalloc(sizeof(Thread))) Thread(Configuration(READY, IDLE_PRIORITY), &idle);
 
     if(preemptive)
         _timer = new (kmalloc(sizeof(Scheduler_Timer))) Scheduler_Timer(QUANTUM, time_slicer);
@@ -31,7 +29,6 @@ void Thread::init()
     This_Thread::not_booting();
 
     _running->_context->load();
-
 }
 
 __END_SYS
