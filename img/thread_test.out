@@ -1003,9 +1003,9 @@ Thread::yield(running=0x0009ffcc)
 ,esp=0x00093eec,eip=0x000034ad,cs=8,ds=10,es=10,fs=10,gs=10,ss=10,cr3=0x0fffc000
 }})
 ~Thread(this=0x0009ffcc,state=0,stack={b=,context={b=0x0009fe2c,{eflags=0x4608,e
-ax=0x9ff18,ebx=0xffa9fbc,ecx=0x8ff84,edx=0x9febf,esi=0x9ffd0,edi=0x3c63,ebp=0x00
-097dac,esp=0x0009fe50,eip=0x00000020,cs=8,ds=10,es=10,fs=10,gs=10,ss=10,cr3=0x0f
-ffc000}})
+ax=0x9ff18,ebx=0,ecx=0x8ff80,edx=0x4000ac,esi=0x9ffd0,edi=0x3c63,ebp=0x00097dac,
+esp=0x0009fe50,eip=0x00000020,cs=8,ds=10,es=10,fs=10,gs=10,ss=10,cr3=0x0fffc000}
+})
 Thread::exit(running=0x0009ffcc)
 Thread::dispatch(prev=0x0009ffcc,next=0x0009bfa4)
 The last thread in the system has exited!
