@@ -7,7 +7,33 @@
 
 __BEGIN_UTIL
 
-typedef void (Handler)();
+typedef void (function)();
+
+class Handler
+{
+	public:
+		Handler(){};
+		~Handler(){};
+		virtual void operator()(){};
+};
+
+class Function_Handler : public Handler
+{
+	public:
+		Function_Handler (function* f)
+		{
+			_f = f;
+		}
+		~Function_Handler(){};
+
+		void operator()()
+		{
+			(*_f)();
+		};
+		
+		private:
+			function* _f;
+};
 
 __END_UTIL
 

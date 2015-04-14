@@ -39,7 +39,7 @@ template<> struct Traits<Debug>
     static const bool error   = true;
     static const bool warning = true;
     static const bool info    = false;
-    static const bool trace   = true;
+    static const bool trace   = false;
 };
 
 template<> struct Traits<Lists>: public Traits<void>
@@ -122,8 +122,7 @@ template<> struct Traits<Thread>: public Traits<void>
     static const bool preemptive = true;
     static const unsigned int QUANTUM = 10000; // us
 
-    static const bool trace_idle = true;
-    static const bool debugged = true;
+    static const bool trace_idle = hysterically_debugged;
 };
 
 template<> struct Traits<Alarm>: public Traits<void>

@@ -11,15 +11,16 @@ __BEGIN_SYS
 
 void Thread::init()
 {
-	unsigned int IDLE_PRIORITY = (unsigned int)(-1);
-
     int (* entry)() = reinterpret_cast<int (*)()>(__epos_app_entry);
 
     db<Init, Thread>(TRC) << "Thread::init(entry=" << reinterpret_cast<void *>(entry) << ")" << endl;
 
-    _running = new (kmalloc(sizeof(Thread))) Thread(Configuration(RUNNING, NORMAL), entry);
+    // Create the application's main thread
+    // This must precede idle, thus avoiding implicit rescheduling
+    // For preemptive scheduling, reschedule() is called, but it will preserve MAIN as the RUNNING thread
+    _running = new (kmalloc(sizeof(Thread))) Thread(Configuration(RUNNING, MAIN), entry);
+    new (kmalloc(sizeof(Thread))) Thread(Configuration(READY, IDLE), &idle);
 
-    new (kmalloc(sizeof(Thread))) Thread(Configuration(READY, IDLE_PRIORITY), &idle);
 
     if(preemptive)
         _timer = new (kmalloc(sizeof(Scheduler_Timer))) Scheduler_Timer(QUANTUM, time_slicer);
@@ -29,7 +30,6 @@ void Thread::init()
     This_Thread::not_booting();
 
     _running->_context->load();
-
 }
 
 __END_SYS

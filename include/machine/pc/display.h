@@ -52,6 +52,9 @@ public:
 
 class PC_Display: public Display_Common, private MC6845
 {
+    friend class PC_Setup;
+    friend class First_Object;
+    
 private:
     static const unsigned int FB = Traits<PC_Display>::FRAME_BUFFER_ADDRESS;
     static const int LINES = Traits<PC_Display>::LINES;
@@ -140,6 +143,10 @@ private:
             _frame_buffer[i] = _frame_buffer[i + COLUMNS];
         for(unsigned int i = (LINES - 1) * COLUMNS; i < LINES * COLUMNS; i++)
             _frame_buffer[i] = NORMAL | ' ';
+    }
+    
+    static void init() {
+        remap();
     }
 
 private:

@@ -52,7 +52,7 @@ void Alarm::delay(const Microsecond & time)
 
 	Semaphore semaphore(0);
 	Semaphore_Handler semaphore_handler(&semaphore);
-	Alarm alarm(time, &semaphore_handler, 1);
+	Alarm alarm(time, &semaphore.v, 1);
 	semaphore.p();
 }
 
