@@ -5,7 +5,7 @@
 
 using namespace EPOS;
 
-const int iterations = 10;
+const int iterations = 4;
 
 void func_a(void);
 void func_b(void);
@@ -22,15 +22,15 @@ int main()
 	Function_Handler fa (&func_a);
 	Function_Handler fb (&func_b);
 
-	Alarm alarm_a(2000000, &func_a, iterations);
-    Alarm alarm_b(1000000, &func_b, iterations);
+	Alarm alarm_a(2000000, &fa, iterations);
+    Alarm alarm_b(1000000, &fb, iterations);
 
     // Note that in case of idle-waiting, this thread will go into suspend
     // and the alarm handlers above will trigger the functions in the context
     // of the idle thread!
     Alarm::delay(1000000 * (iterations + 1));
 
-    cout << "I'm done, bye!" << endl;
+    cout << "I'm done, bye! " << endl;
 
     return 0;
 }
@@ -42,7 +42,7 @@ void func_a()
     cout << endl;
 }
 
-void func_b(void)
+ void func_b(void)
 {
     for(int i = 0; i < 79; i++)
         cout << "b";

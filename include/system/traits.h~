@@ -127,7 +127,7 @@ template<> struct Traits<Thread>: public Traits<void>
 
 template<> struct Traits<Alarm>: public Traits<void>
 {
-    static const bool visible = false;
+    static const bool visible = true;
 };
 
 template<> struct Traits<Synchronizer>: public Traits<void>

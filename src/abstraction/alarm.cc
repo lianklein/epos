@@ -48,8 +48,6 @@ void Alarm::delay(const Microsecond & time)
 {
     db<Alarm>(TRC) << "Alarm::delay(time=" << time << ")" << endl;
 
-	//Tick t = _elapsed + ticks(time);
-
 	Semaphore semaphore(0);
 	Semaphore_Handler semaphore_handler(&semaphore);
 	Alarm alarm(time, &semaphore_handler, 1);
@@ -61,6 +59,7 @@ void Alarm::handler(const IC::Interrupt_Id & i)
 {
     static Tick next_tick;
     static Handler * next_handler;
+	Handler * current_handler = 0;
 
     lock();
 
@@ -80,7 +79,7 @@ void Alarm::handler(const IC::Interrupt_Id & i)
     if(!next_tick) {
         if(next_handler) {
             db<Alarm>(TRC) << "Alarm::handler(h=" << reinterpret_cast<void *>(next_handler) << ")" << endl;
-            (*next_handler)();
+			current_handler = next_handler;
         }
         if(_request.empty())
             next_handler = 0;
@@ -99,6 +98,10 @@ void Alarm::handler(const IC::Interrupt_Id & i)
     }
 
     unlock();
+	if(current_handler)
+	{
+	     (*current_handler)();
+	}
 }
 
 __END_SYS

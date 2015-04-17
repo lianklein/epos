@@ -36,8 +36,8 @@ template<> struct Traits<Build>
 // Utilities
 template<> struct Traits<Debug>
 {
-    static const bool error   = true;
-    static const bool warning = true;
+    static const bool error   = false;
+    static const bool warning = false;
     static const bool info    = false;
     static const bool trace   = false;
 };
@@ -127,7 +127,7 @@ template<> struct Traits<Thread>: public Traits<void>
 
 template<> struct Traits<Alarm>: public Traits<void>
 {
-    static const bool visible = hysterically_debugged;
+    static const bool visible = false;
 };
 
 template<> struct Traits<Synchronizer>: public Traits<void>

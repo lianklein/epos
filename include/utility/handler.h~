@@ -7,11 +7,11 @@
 
 __BEGIN_UTIL
 
-typedef void (function)();
 
 class Handler
 {
 	public:
+		typedef void (function)();
 		Handler(){};
 		~Handler(){};
 		virtual void operator()(){};

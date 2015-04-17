@@ -1,14 +1,15 @@
 Setting up this machine as follows: 
-  Processor:    IA32 at 2301 MHz (BUS clock = 125 MHz)
+  Processor:    IA32 at 2296 MHz (BUS clock = 125 MHz)
   Memory:       262144 Kbytes [0x00000000:0x10000000]
   User memory:  261800 Kbytes [0x00000000:0x0ffaa000]
   PCI aperture: 45064 Kbytes [0xfc000000:0xfec02000]
   Node Id:      will get from the network!
-  Setup:        18880 bytes
-  APP code:     14720 bytes	data: 544 bytes
+  Setup:        16064 bytes
+  APP code:     14512 bytes	data: 544 bytes
 Alarm test
 I'm the first thread of the first task created in the system.
 I'll now create two alarms and put myself in a delay ...
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
@@ -25,5 +26,3 @@ bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 I'm done, bye!
-The last thread has exited!
-Rebooting the machine ...

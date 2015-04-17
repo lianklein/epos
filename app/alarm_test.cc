@@ -42,7 +42,7 @@ void func_a()
     cout << endl;
 }
 
-void func_b(void)
+ void func_b(void)
 {
     for(int i = 0; i < 79; i++)
         cout << "b";
