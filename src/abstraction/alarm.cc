@@ -77,9 +77,10 @@ void Alarm::handler(const IC::Interrupt_Id & i)
 	  Alarm * alarm = e->object();
     Handler * handler = alarm->_handler;
 
-    if(alarm->_ticks)
+
+    if(alarm->_ticks > 0)
         alarm->_ticks--;
-    if(!alarm->ticks) {
+    else {
       handler = 0;
       if(alarm->_times != -1)
           alarm->_times--;
@@ -88,15 +89,14 @@ void Alarm::handler(const IC::Interrupt_Id & i)
       } else {
         _request.remove(e);
       }
-    } else {
-      unlock();
     }
 
   	if(handler)
   	{
-      (*alarm->_handler)();
+      (*handler)();
   	}
   } else {
+    unlock();
   }
 }
 
