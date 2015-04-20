@@ -71,30 +71,32 @@ void Alarm::handler(const IC::Interrupt_Id & i)
       display.position(lin, col);
   }
   if(!_request.empty()){
-    Queue::Element * e = _request.head();
-	  Alarm * alarm = e->object();
+    do {
+      Queue::Element * e = _request.head();
+  	  Alarm * alarm = e->object();
 
-    if(alarm->_ticks > 1)
-        alarm->_ticks--;
-    else {
-      if(alarm->_handler) {
+      if(alarm->_ticks)
+          alarm->_ticks--;
+      else {
         handler = alarm->_handler;
+        _request.remove();
+        if(alarm->_times != -1)
+            alarm->_times--;
+        if(alarm->_times) {
+            alarm->_ticks = alarm->_original_ticks;
+            e->rank(alarm->_ticks);
+            _request.insert(e);
+        }
+        db<Alarm>(TRC) << "Alarm::handler(current: ticks=" << alarm->_ticks << "; times=" << alarm->_times << "; id=" << e << ")" << endl;
       }
-      _request.remove(e);
-      if(alarm->_times != -1)
-          alarm->_times--;
-      if(alarm->_times) {
-          db<Alarm>(TRC) << "Alarm::handler(ticks=" << alarm->_ticks << ")" << endl;
-          alarm->_ticks = alarm->_original_ticks;
-          e->rank(alarm->_ticks);
-          _request.insert(e);
+      unlock();
+      if(handler) {
+        (*handler)();
       }
-    }
+      lock();
+    } while(!_request.empty() && !_request.head()->object()->_ticks);
   }
   unlock();
-  if(handler) {
-    (*handler)();
-  }
 }
 
 __END_SYS
