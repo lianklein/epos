@@ -19,16 +19,16 @@ class Alarm
 
 private:
     typedef TSC::Hertz Hertz;
-    typedef Timer::Tick Tick;  
+    typedef Timer::Tick Tick;
 
     typedef Relative_Queue<Alarm, Tick> Queue;
 
 public:
     typedef RTC::Microsecond Microsecond;
-    
+
     // Infinite times (for alarms)
     enum { INFINITE = RTC::INFINITE };
-    
+
 public:
     Alarm(const Microsecond & time, Handler * handler, int times = 1);
     ~Alarm();
@@ -36,6 +36,8 @@ public:
     static Hertz frequency() { return _timer->frequency(); }
 
     static void delay(const Microsecond & time);
+
+    void reentrant_handler();
 
 private:
     static void init();
@@ -56,7 +58,7 @@ private:
 private:
     Tick _ticks;
     Handler * _handler;
-    int _times; 
+    int _times;
     Queue::Element _link;
 
     static Alarm_Timer * _timer;

@@ -42,7 +42,6 @@ Alarm::~Alarm()
     unlock();
 }
 
-
 // Class methods
 void Alarm::delay(const Microsecond & time)
 {
@@ -54,54 +53,51 @@ void Alarm::delay(const Microsecond & time)
 	semaphore.p();
 }
 
-
 void Alarm::handler(const IC::Interrupt_Id & i)
 {
-    static Tick next_tick;
-    static Handler * next_handler;
-	Handler * current_handler = 0;
 
-    lock();
+  _elapsed++;
 
-    _elapsed++;
+  lock();
+  if(Traits<Alarm>::visible) {
+      Display display;
+      int lin, col;
+      display.position(&lin, &col);
+      display.position(0, 79);
+      display.putc(_elapsed);
+      display.position(lin, col);
+  }
+  unlock();
 
-    if(Traits<Alarm>::visible) {
-        Display display;
-        int lin, col;
-        display.position(&lin, &col);
-        display.position(0, 79);
-        display.putc(_elapsed);
-        display.position(lin, col);
-    }
-
-    if(next_tick)
-        next_tick--;
-    if(!next_tick) {
-        if(next_handler) {
-            db<Alarm>(TRC) << "Alarm::handler(h=" << reinterpret_cast<void *>(next_handler) << ")" << endl;
-			current_handler = next_handler;
-        }
-        if(_request.empty())
-            next_handler = 0;
-        else {
-            Queue::Element * e = _request.remove();
-            Alarm * alarm = e->object();
-            next_tick = alarm->_ticks;
-            next_handler = alarm->_handler;
-            if(alarm->_times != -1)
-                alarm->_times--;
-            if(alarm->_times) {
-                e->rank(alarm->_ticks);
-                _request.insert(e);
-            }
-        }
-    }
-
+  lock();
+  if(!_request.empty()){
+    Queue::Element * e = _request.head();
     unlock();
-	if(current_handler)
-	{
-	     (*current_handler)();
-	}
+
+	  Alarm * alarm = e->object();
+    Handler * handler = alarm->_handler;
+
+    if(alarm->_ticks)
+        alarm->_ticks--;
+    if(!alarm->ticks) {
+      handler = 0;
+      if(alarm->_times != -1)
+          alarm->_times--;
+      if(alarm->_times) {
+          e->rank(alarm->_ticks);
+      } else {
+        _request.remove(e);
+      }
+    } else {
+      unlock();
+    }
+
+  	if(handler)
+  	{
+      (*alarm->_handler)();
+  	}
+  } else {
+  }
 }
 
 __END_SYS

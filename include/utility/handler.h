@@ -20,7 +20,7 @@ class Handler
 class Function_Handler : public Handler
 {
 	public:
-		Function_Handler (function* f)
+		Function_Handler (function * f)
 		{
 			_f = f;
 		}
@@ -30,7 +30,7 @@ class Function_Handler : public Handler
 		{
 			(*_f)();
 		};
-		
+
 		private:
 			function* _f;
 };
