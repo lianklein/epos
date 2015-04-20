@@ -30,14 +30,12 @@ public:
     enum { INFINITE = RTC::INFINITE };
 
 public:
-    Alarm(const Microsecond & time, Handler * handler, int times = 1);
+    Alarm(const Microsecond & time, Handler * handler, unsigned long times = 1);
     ~Alarm();
 
     static Hertz frequency() { return _timer->frequency(); }
 
     static void delay(const Microsecond & time);
-
-    void reentrant_handler();
 
 private:
     static void init();
@@ -57,6 +55,7 @@ private:
 
 private:
     Tick _ticks;
+    Tick _original_ticks;
     Handler * _handler;
     int _times;
     Queue::Element _link;

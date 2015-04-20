@@ -2,6 +2,7 @@
 
 #include <utility/ostream.h>
 #include <alarm.h>
+#include <mutex.h>
 
 using namespace EPOS;
 

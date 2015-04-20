@@ -13,13 +13,15 @@ Alarm::Queue Alarm::_request;
 
 
 // Methods
-Alarm::Alarm(const Microsecond & time, Handler * handler, int times)
+Alarm::Alarm(const Microsecond & time, Handler * handler, unsigned long times)
 : _ticks(ticks(time)), _handler(handler), _times(times), _link(this, _ticks)
 {
     lock();
 
     db<Alarm>(TRC) << "Alarm(t=" << time << ",tk=" << _ticks << ",h=" << reinterpret_cast<void *>(handler)
                    << ",x=" << times << ") => " << this << endl;
+
+     _original_ticks = _ticks;
 
     if(_ticks) {
         _request.insert(&_link);
@@ -55,10 +57,11 @@ void Alarm::delay(const Microsecond & time)
 
 void Alarm::handler(const IC::Interrupt_Id & i)
 {
+  lock();
+  Handler * handler = 0;
 
   _elapsed++;
 
-  lock();
   if(Traits<Alarm>::visible) {
       Display display;
       int lin, col;
@@ -67,36 +70,30 @@ void Alarm::handler(const IC::Interrupt_Id & i)
       display.putc(_elapsed);
       display.position(lin, col);
   }
-  unlock();
-
-  lock();
   if(!_request.empty()){
     Queue::Element * e = _request.head();
-    unlock();
-
 	  Alarm * alarm = e->object();
-    Handler * handler = alarm->_handler;
 
-
-    if(alarm->_ticks > 0)
+    if(alarm->_ticks > 1)
         alarm->_ticks--;
     else {
-      handler = 0;
+      if(alarm->_handler) {
+        handler = alarm->_handler;
+      }
+      _request.remove(e);
       if(alarm->_times != -1)
           alarm->_times--;
       if(alarm->_times) {
+          db<Alarm>(TRC) << "Alarm::handler(ticks=" << alarm->_ticks << ")" << endl;
+          alarm->_ticks = alarm->_original_ticks;
           e->rank(alarm->_ticks);
-      } else {
-        _request.remove(e);
+          _request.insert(e);
       }
     }
-
-  	if(handler)
-  	{
-      (*handler)();
-  	}
-  } else {
-    unlock();
+  }
+  unlock();
+  if(handler) {
+    (*handler)();
   }
 }
 
