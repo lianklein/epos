@@ -1,0 +1,7 @@
+make --print-directory run1
+make[1]: Entering directory '/home/joao/git/epos'
+(cd etc && make --print-directory)
+make[2]: Entering directory '/home/joao/git/epos/etc'
+install /home/joao/git/epos/include/system/traits.h /home/joao/git/epos/app/alarm_test_traits.h
+makefile:21: recipe for target 'etc' failed
+makefile:27: recipe for target 'run' failed

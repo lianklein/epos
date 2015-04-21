@@ -1,0 +1,709 @@
+Index: include/alarm.h
+===================================================================
+--- include/alarm.h	(revisão 3518)
++++ include/alarm.h	(cópia de trabalho)
+@@ -19,18 +19,18 @@
+ 
+ private:
+     typedef TSC::Hertz Hertz;
+-    typedef Timer::Tick Tick;  
++    typedef Timer::Tick Tick;
+ 
+     typedef Relative_Queue<Alarm, Tick> Queue;
+ 
+ public:
+     typedef RTC::Microsecond Microsecond;
+-    
++
+     // Infinite times (for alarms)
+     enum { INFINITE = RTC::INFINITE };
+-    
++
+ public:
+-    Alarm(const Microsecond & time, Handler * handler, int times = 1);
++    Alarm(const Microsecond & time, Handler * handler, unsigned long times = 1);
+     ~Alarm();
+ 
+     static Hertz frequency() { return _timer->frequency(); }
+@@ -55,8 +55,9 @@
+ 
+ private:
+     Tick _ticks;
++    Tick _original_ticks;
+     Handler * _handler;
+-    int _times; 
++    int _times;
+     Queue::Element _link;
+ 
+     static Alarm_Timer * _timer;
+Index: include/semaphore.h
+===================================================================
+--- include/semaphore.h	(revisão 3518)
++++ include/semaphore.h	(cópia de trabalho)
+@@ -4,6 +4,7 @@
+ #define __semaphore_h
+ 
+ #include <synchronizer.h>
++#include <utility/handler.h>
+ 
+ __BEGIN_SYS
+ 
+@@ -20,7 +21,26 @@
+     volatile int _value;
+ };
+ 
++class Semaphore_Handler: public Handler
++{
++public:
++    Semaphore_Handler(Semaphore * h)
++	{
++ 		_semaphore = h;
++	}
+ 
++	~Semaphore_Handler() {}
++
++    void operator()()
++	{
++		_semaphore->v();
++	}
++	
++private:
++	
++    Semaphore * _semaphore;
++};
++
+ __END_SYS
+ 
+ #endif
+Index: include/system/config.h
+===================================================================
+--- include/system/config.h	(revisão 3518)
++++ include/system/config.h	(cópia de trabalho)
+@@ -7,15 +7,15 @@
+ // ARCHITECTURE, MACHINE, AND APPLICATION SELECTION
+ // This section is generated automatically from makedefs by $EPOS/etc/makefile
+ //============================================================================
+-#define MODE xxx
+-#define ARCH xxx
+-#define MACH xxx
+-#define MMOD xxx
+-#define APPL xxx
+-#define __mode_xxx__
+-#define __arch_xxx__
+-#define __mach_xxx__
+-#define __mmod_xxx__
++#define MODE library
++#define ARCH ia32
++#define MACH pc
++#define MMOD legacy
++#define APPL alarm_test
++#define __mode_library__
++#define __arch_ia32__
++#define __mach_pc__
++#define __mmod_legacy__
+ 
+ #if defined (__arch_avr__) || defined (__mmod_lm3s811__)
+ #define __no_networking__
+Index: include/system/traits.h
+===================================================================
+--- include/system/traits.h	(revisão 3518)
++++ include/system/traits.h	(cópia de trabalho)
+@@ -36,8 +36,8 @@
+ // Utilities
+ template<> struct Traits<Debug>
+ {
+-    static const bool error   = true;
+-    static const bool warning = true;
++    static const bool error   = false;
++    static const bool warning = false;
+     static const bool info    = false;
+     static const bool trace   = false;
+ };
+@@ -127,7 +127,7 @@
+ 
+ template<> struct Traits<Alarm>: public Traits<void>
+ {
+-    static const bool visible = hysterically_debugged;
++    static const bool visible = false;
+ };
+ 
+ template<> struct Traits<Synchronizer>: public Traits<void>
+Index: include/utility/handler.h
+===================================================================
+--- include/utility/handler.h	(revisão 3518)
++++ include/utility/handler.h	(cópia de trabalho)
+@@ -7,8 +7,34 @@
+ 
+ __BEGIN_UTIL
+ 
+-typedef void (Handler)();
++typedef void (function)();
+ 
++class Handler
++{
++	public:
++		Handler(){};
++		~Handler(){};
++		virtual void operator()(){};
++};
++
++class Function_Handler : public Handler
++{
++	public:
++		Function_Handler (function * f)
++		{
++			_f = f;
++		}
++		~Function_Handler(){}
++
++		void operator()()
++		{
++			(*_f)();
++		};
++
++		private:
++			function* _f;
++};
++
+ __END_UTIL
+ 
+ #endif
+Index: include/utility/list.h
+===================================================================
+--- include/utility/list.h	(revisão 3518)
++++ include/utility/list.h	(cópia de trabalho)
+@@ -35,7 +35,7 @@
+ 
+     public:
+         Pointer(const T * o): _object(o) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+     private:
+@@ -77,12 +77,12 @@
+ 
+     public:
+         Singly_Linked(const T * o): _object(o), _next(0) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+         Element * next() const { return _next; }
+         void next(Element * e) { _next = e; }
+-    
++
+     private:
+         const T * _object;
+         Element * _next;
+@@ -100,7 +100,7 @@
+ 
+     public:
+         Singly_Linked_Ordered(const T * o, const R & r = 0): _object(o), _rank(r), _next(0) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+         Element * next() const { return _next; }
+@@ -138,7 +138,7 @@
+         void size(unsigned int l) { _size = l; }
+         void shrink(unsigned int n) { _size -= n; }
+         void expand(unsigned int n) { _size += n; }
+-    
++
+     private:
+         const T * _object;
+         unsigned int _size;
+@@ -155,7 +155,7 @@
+ 
+     public:
+         Doubly_Linked(const T * o): _object(o), _prev(0), _next(0) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+         Element * prev() const { return _prev; }
+@@ -162,7 +162,7 @@
+         Element * next() const { return _next; }
+         void prev(Element * e) { _prev = e; }
+         void next(Element * e) { _next = e; }
+-    
++
+     private:
+         const T * _object;
+         Element * _prev;
+@@ -180,7 +180,7 @@
+ 
+     public:
+         Doubly_Linked_Ordered(const T * o,  const R & r = 0): _object(o), _rank(r), _prev(0), _next(0) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+         Element * prev() const { return _prev; }
+@@ -199,7 +199,7 @@
+         Element * _prev;
+         Element * _next;
+     };
+-    
++
+     // Scheduling List Element
+     template<typename T, typename R = Rank>
+     class Doubly_Linked_Scheduling
+@@ -211,7 +211,7 @@
+ 
+     public:
+         Doubly_Linked_Scheduling(const T * o,  const R & r = 0): _object(o), _rank(r), _prev(0), _next(0) {}
+-    
++
+         T * object() const { return const_cast<T *>(_object); }
+ 
+         Element * prev() const { return _prev; }
+@@ -254,7 +254,7 @@
+         void size(unsigned int l) { _size = l; }
+         void shrink(unsigned int n) { _size -= n; }
+         void expand(unsigned int n) { _size += n; }
+-    
++
+     private:
+         const T * _object;
+         unsigned int _size;
+@@ -320,7 +320,7 @@
+ 
+         Iterator & operator--() { _current = _current->prev(); return *this; }
+         Iterator operator--(int) { Iterator tmp = *this; --*this; return tmp; }
+-        
++
+         bool operator==(const Iterator & i) const { return _current == i._current; }
+         bool operator!=(const Iterator & i) const { return _current != i._current; }
+ 
+@@ -372,7 +372,7 @@
+             _size++;
+         }
+     }
+-    
++
+     Element * remove() { return remove_head(); }
+ 
+     Element * remove(Element * e) {
+@@ -416,13 +416,13 @@
+             return remove(e);
+         return 0;
+     }
+-    
++
+     Element * search(const Object_Type * obj) {
+         Element * e = _head;
+             for(; e && (e->object() != obj); e = e->next());
+             return e;
+     }
+-    
++
+ protected:
+     bool last() const { return (_size == 1); }
+ 
+@@ -455,8 +455,8 @@
+ 
+ 
+ // Singly-Linked, Ordered List
+-template<typename T, 
+-          typename R = List_Element_Rank, 
++template<typename T,
++          typename R = List_Element_Rank,
+           typename El = List_Elements::Singly_Linked_Ordered<T, R>,
+           bool relative = false>
+ class Simple_Ordered_List: public Simple_List<T, El>
+@@ -477,7 +477,7 @@
+     using Base::begin;
+     using Base::end;
+     using Base::remove_head;
+-    
++
+     void insert(Element * e) {
+         if(empty())
+             insert_first(e);
+@@ -503,7 +503,7 @@
+             }
+         }
+     }
+-    
++
+     Element * remove() { return remove_head(); }
+ 
+     Element * remove(Element * e) {
+@@ -519,7 +519,7 @@
+             return remove(e);
+         return 0;
+     }
+-    
++
+     Element * search_rank(const Rank_Type & rank) {
+         Element * e = head();
+         for(; e && (e->rank() != rank); e = e->next());
+@@ -536,7 +536,7 @@
+ 
+ 
+ // Singly-Linked, Relative Ordered List
+-template<typename T, 
++template<typename T,
+           typename R = List_Element_Rank,
+           typename El = List_Elements::Singly_Linked_Ordered<T, R> >
+ class Simple_Relative_List: public Simple_Ordered_List<T, R, El, true> {};
+@@ -572,13 +572,13 @@
+         for(; e && (e->size() < s); e = e->next());
+         return e;
+     }
+-    
++
+     Element * search_left(const Object_Type * obj) {
+         Element * e = head();
+         for(; e && (e->object() + e->size() != obj); e = e->next());
+         return e;
+     }
+-    
++
+     void insert_merging(Element * e, Element ** m1, Element ** m2) {
+         _grouped_size += e->size();
+         *m1 = *m2 = 0;
+@@ -595,7 +595,7 @@
+         } else
+             insert_tail(e);
+     }
+-    
++
+     Element * search_decrementing(unsigned int s) {
+         Element * e = search_size(s);
+         if(e) {
+@@ -606,7 +606,7 @@
+         }
+         return e;
+     }
+-    
++
+ private:
+     unsigned int _grouped_size;
+ };
+@@ -627,10 +627,10 @@
+ 
+     bool empty() const { return (_size == 0); }
+     unsigned int size() const { return _size; }
+-    
++
+     Element * head() { return _head; }
+     Element * tail() { return _tail; }
+-    
++
+     Iterator begin() { return Iterator(_head); }
+     Iterator end() { return Iterator(0); }
+ 
+@@ -637,7 +637,7 @@
+     void insert(Element * e) { insert_tail(e); }
+ 
+     void insert_head(Element * e) {
+-        db<Lists>(TRC) << "List::insert_head(e=" << e 
++        db<Lists>(TRC) << "List::insert_head(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -661,7 +661,7 @@
+     }
+ 
+     void insert_tail(Element * e) {
+-        db<Lists>(TRC) << "List::insert_tail(e=" << e 
++        db<Lists>(TRC) << "List::insert_tail(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -683,11 +683,11 @@
+         print_head();
+         print_tail();
+     }
+-    
++
+     Element * remove() { return remove_head(); }
+ 
+     Element * remove(Element * e) {
+-        db<Lists>(TRC) << "List::remove(e=" << e 
++        db<Lists>(TRC) << "List::remove(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -762,13 +762,13 @@
+             return remove(e);
+         return 0;
+     }
+-    
++
+     Element * search(const Object_Type * obj) {
+         Element * e = _head;
+         for(; e && (e->object() != obj); e = e->next());
+         return e;
+     }
+-    
++
+ protected:
+     bool last() const { return (_size == 1); }
+ 
+@@ -799,7 +799,7 @@
+     }
+ 
+     void insert_first(Element * e) {
+-        db<Lists>(TRC) << "List::insert_first(e=" << e 
++        db<Lists>(TRC) << "List::insert_first(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -836,7 +836,7 @@
+     }
+ 
+     void print_head() {
+-        db<Lists>(INF) << "List[" << this << "]::head=" << head() 
++        db<Lists>(INF) << "List[" << this << "]::head=" << head()
+                        << " => {p=" << (head() ? head()->prev() : (void *) -1)
+                        << ",o=" << (head() ? head()->object() : (void *) -1)
+                        << ",n=" << (head() ? head()->next() : (void *) -1)
+@@ -844,7 +844,7 @@
+     }
+ 
+     void print_tail() {
+-        db<Lists>(INF) << "List[" << this << "]::tail=" << tail() 
++        db<Lists>(INF) << "List[" << this << "]::tail=" << tail()
+                        << " => {p=" << (tail() ? tail()->prev() : (void *) -1)
+                        << ",o=" << (tail() ? tail()->object() : (void *) -1)
+                        << ",n=" << (tail() ? tail()->next() : (void *) -1)
+@@ -887,7 +887,7 @@
+     using Base::search;
+ 
+     void insert(Element * e) {
+-        db<Lists>(TRC) << "Ordered_List::insert(e=" << e 
++        db<Lists>(TRC) << "Ordered_List::insert(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -917,8 +917,8 @@
+             }
+         }
+     }
+-    
+-    Element * remove() { 
++
++    Element * remove() {
+         db<Lists>(TRC) << "Ordered_List::remove()" << endl;
+ 
+         return Base::remove_head();
+@@ -925,7 +925,7 @@
+     }
+ 
+     Element * remove(Element * e) {
+-        db<Lists>(TRC) << "Ordered_List::remove(e=" << e 
++        db<Lists>(TRC) << "Ordered_List::remove(e=" << e
+                        << ") => {p=" << (e ? e->prev() : (void *) -1)
+                        << ",o=" << (e ? e->object() : (void *) -1)
+                        << ",n=" << (e ? e->next() : (void *) -1)
+@@ -947,7 +947,7 @@
+         else
+             return 0;
+     }
+-    
++
+     Element * search_rank(const Rank_Type & rank) {
+         Element * e = head();
+         for(; e && (e->rank() != rank); e = e->next());
+@@ -1075,7 +1075,7 @@
+ 
+ 
+ // Doubly-Linked, Grouping List
+-template<typename T, 
++template<typename T,
+           typename El = List_Elements::Doubly_Linked_Grouping<T> >
+ class Grouping_List: public List<T, El>
+ {
+@@ -1103,19 +1103,19 @@
+     using Base::print_tail;
+ 
+     unsigned int grouped_size() const { return _grouped_size; }
+-    
++
+     Element * search_size(unsigned int s) {
+         Element * e = head();
+         for(; e && (e->size() < sizeof(Element) + s) && (e->size() != s); e = e->next());
+         return e;
+     }
+-    
++
+     Element * search_left(const Object_Type * obj) {
+         Element * e = head();
+         for(; e && (e->object() + e->size() != obj); e = e->next());
+         return e;
+     }
+-    
++
+     void insert_merging(Element * e, Element ** m1, Element ** m2) {
+         db<Lists>(TRC) << "Grouping_List::insert_merging(e=" << e << ")" << endl;
+ 
+@@ -1136,7 +1136,7 @@
+             *m2 = e;
+         }
+     }
+-    
++
+     Element * search_decrementing(unsigned int s) {
+         db<Lists>(TRC) << "Grouping_List::search_decrementing(s=" << s << ")" << endl;
+         print_head();
+@@ -1152,11 +1152,11 @@
+ 
+         return e;
+     }
+-    
++
+ private:
+     unsigned int _grouped_size;
+ };
+ 
+ __END_UTIL
+- 
++
+ #endif
+Index: src/abstraction/alarm.cc
+===================================================================
+--- src/abstraction/alarm.cc	(revisão 3518)
++++ src/abstraction/alarm.cc	(cópia de trabalho)
+@@ -13,7 +13,7 @@
+ 
+ 
+ // Methods
+-Alarm::Alarm(const Microsecond & time, Handler * handler, int times)
++Alarm::Alarm(const Microsecond & time, Handler * handler, unsigned long times)
+ : _ticks(ticks(time)), _handler(handler), _times(times), _link(this, _ticks)
+ {
+     lock();
+@@ -21,6 +21,8 @@
+     db<Alarm>(TRC) << "Alarm(t=" << time << ",tk=" << _ticks << ",h=" << reinterpret_cast<void *>(handler)
+                    << ",x=" << times << ") => " << this << endl;
+ 
++     _original_ticks = _ticks;
++
+     if(_ticks) {
+         _request.insert(&_link);
+         unlock();
+@@ -42,60 +44,59 @@
+     unlock();
+ }
+ 
+-
+ // Class methods
+ void Alarm::delay(const Microsecond & time)
+ {
+     db<Alarm>(TRC) << "Alarm::delay(time=" << time << ")" << endl;
+ 
+-	Tick t = _elapsed + ticks(time);
+-
+-	while(_elapsed < t);
++	Semaphore semaphore(0);
++	Semaphore_Handler semaphore_handler(&semaphore);
++	Alarm alarm(time, &semaphore_handler, 1);
++	semaphore.p();
+ }
+ 
+-
+ void Alarm::handler(const IC::Interrupt_Id & i)
+ {
+-    static Tick next_tick;
+-    static Handler * next_handler;
++  lock();
++  Handler * handler = 0;
+ 
+-    lock();
++  _elapsed++;
+ 
+-    _elapsed++;
++  if(Traits<Alarm>::visible) {
++      Display display;
++      int lin, col;
++      display.position(&lin, &col);
++      display.position(0, 79);
++      display.putc(_elapsed);
++      display.position(lin, col);
++  }
++  if(!_request.empty()){
++    do {
++      Queue::Element * e = _request.head();
++  	  Alarm * alarm = e->object();
+ 
+-    if(Traits<Alarm>::visible) {
+-        Display display;
+-        int lin, col;
+-        display.position(&lin, &col);
+-        display.position(0, 79);
+-        display.putc(_elapsed);
+-        display.position(lin, col);
+-    }
+-
+-    if(next_tick)
+-        next_tick--;
+-    if(!next_tick) {
+-        if(next_handler) {
+-            db<Alarm>(TRC) << "Alarm::handler(h=" << reinterpret_cast<void *>(next_handler) << ")" << endl;
+-            (*next_handler)();
++      if(alarm->_ticks)
++          alarm->_ticks--;
++      else {
++        handler = alarm->_handler;
++        _request.remove();
++        if(alarm->_times != -1)
++            alarm->_times--;
++        if(alarm->_times) {
++            alarm->_ticks = alarm->_original_ticks;
++            e->rank(alarm->_ticks);
++            _request.insert(e);
+         }
+-        if(_request.empty())
+-            next_handler = 0;
+-        else {
+-            Queue::Element * e = _request.remove();
+-            Alarm * alarm = e->object();
+-            next_tick = alarm->_ticks;
+-            next_handler = alarm->_handler;
+-            if(alarm->_times != -1)
+-                alarm->_times--;
+-            if(alarm->_times) {
+-                e->rank(alarm->_ticks);
+-                _request.insert(e);
+-            }
+-        }
+-    }
+-
+-    unlock();
++        db<Alarm>(TRC) << "Alarm::handler(current: ticks=" << alarm->_ticks << "; times=" << alarm->_times << "; id=" << e << ")" << endl;
++      }
++      unlock();
++      if(handler) {
++        (*handler)();
++      }
++      lock();
++    } while(!_request.empty() && !_request.head()->object()->_ticks);
++  }
++  unlock();
+ }
+ 
+ __END_SYS
+Index: src/abstraction/thread.cc
+===================================================================
+--- src/abstraction/thread.cc	(revisão 3518)
++++ src/abstraction/thread.cc	(cópia de trabalho)
+@@ -286,6 +286,7 @@
+ 
+ int Thread::idle()
+ {
++
+     while(true) {
+         if(Traits<Thread>::trace_idle)
+             db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
+@@ -301,6 +302,7 @@
+                 CPU::halt();
+             }
+         } else {
++			db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
+             CPU::int_enable();
+             CPU::halt();
+         }
