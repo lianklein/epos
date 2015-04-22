@@ -9,7 +9,7 @@
 #include <rtc.h>
 #include <ic.h>
 #include <timer.h>
-#include <semaphore.h>
+#include <mutex.h>
 
 __BEGIN_SYS
 

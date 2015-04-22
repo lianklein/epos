@@ -5,7 +5,7 @@ Setting up this machine as follows:
   PCI aperture: 45064 Kbytes [0xfc000000:0xfec02000]
   Node Id:      will get from the network!
   Setup:        16064 bytes
-  APP code:     14464 bytes	data: 512 bytes
+  APP code:     14448 bytes	data: 512 bytes
 Alarm test
 I'm the first thread of the first task created in the system.
 I'll now create two alarms and put myself in a delay ...

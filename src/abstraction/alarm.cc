@@ -74,8 +74,7 @@ void Alarm::handler(const IC::Interrupt_Id & i)
     do {
       Queue::Element * e = _request.head();
   	  Alarm * alarm = e->object();
-
-      if(alarm->_ticks)
+      if(alarm->_ticks > 1)
           alarm->_ticks--;
       else {
         handler = alarm->_handler;
@@ -87,7 +86,6 @@ void Alarm::handler(const IC::Interrupt_Id & i)
             e->rank(alarm->_ticks);
             _request.insert(e);
         }
-        db<Alarm>(TRC) << "Alarm::handler(current: ticks=" << alarm->_ticks << "; times=" << alarm->_times << "; id=" << e << ")" << endl;
       }
       unlock();
       if(handler) {

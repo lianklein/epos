@@ -28,7 +28,7 @@ class Function_Handler : public Handler
 
 		void operator()()
 		{
-			(*_f)();
+			_f();
 		};
 
 		private:
