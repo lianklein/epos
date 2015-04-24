@@ -61,7 +61,7 @@ Thread::~Thread()
 
     if(_state != FINISHING)
 	{
-        //_thread_count--;
+        _thread_count--;
 		exit(0);
 	}
 

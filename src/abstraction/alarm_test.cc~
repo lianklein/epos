@@ -37,9 +37,6 @@ int main()
 
 void func_a()
 {
-	for(int i = 0; i < 79; i++)
-        cout << "BB";
-    cout << endl;
 	Alarm::delay(1000000);
     for(int i = 0; i < 79; i++)
         cout << "a";
