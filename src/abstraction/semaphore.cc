@@ -12,7 +12,10 @@ Semaphore::Semaphore(int v): _value(v)
 
 Semaphore::~Semaphore()
 {
-    db<Synchronizer>(TRC) << "~Semaphore(this=" << this << ")" << endl;
+  db<Synchronizer>(TRC) << "~Semaphore(this=" << this << ")" << endl;
+  begin_atomic();
+  _value = 0;
+  v();//implicit end_atomic();
 }
 
 

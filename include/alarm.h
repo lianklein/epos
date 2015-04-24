@@ -9,7 +9,7 @@
 #include <rtc.h>
 #include <ic.h>
 #include <timer.h>
-#include <mutex.h>
+#include <semaphore.h>
 
 __BEGIN_SYS
 
@@ -30,7 +30,7 @@ public:
     enum { INFINITE = RTC::INFINITE };
 
 public:
-    Alarm(const Microsecond & time, Handler * handler, unsigned long times = 1);
+    Alarm(const Microsecond & time, Handler * handler, int times = 1);
     ~Alarm();
 
     static Hertz frequency() { return _timer->frequency(); }

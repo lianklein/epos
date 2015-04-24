@@ -21,10 +21,10 @@ int main()
     cout << "I'll now create two alarms and put myself in a delay ..." << endl;
 
 	  Function_Handler fa (&func_a);
-	  Function_Handler fb (&func_b);
+	  //Function_Handler fb (&func_b);
 
-	  Alarm alarm_a(2000000, &fa, iterations);
-    Alarm alarm_b(1000000, &fb, iterations);
+	  Alarm alarm_a(1000000, &fa, iterations);
+    //Alarm alarm_b(1000000, &fb, iterations);
 
     // Note that in case of idle-waiting, this thread will go into suspend
     // and the alarm handlers above will trigger the functions in the context
@@ -38,9 +38,9 @@ int main()
 
 void func_a()
 {
-    for(int i = 0; i < 79; i++)
-        cout << "a";
-    cout << endl;
+    for(int i = 0; i < 39; i++) cout << "H"; cout << endl;
+    Alarm::delay(1000000);
+    for(int i = 0; i < 39; i++) cout << "L"; cout << endl;
 }
 
  void func_b(void)
