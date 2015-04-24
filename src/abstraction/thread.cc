@@ -286,7 +286,6 @@ void Thread::implicit_exit()
 
 int Thread::idle()
 {
-
     while(true) {
         if(Traits<Thread>::trace_idle)
             db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
@@ -302,7 +301,6 @@ int Thread::idle()
                 CPU::halt();
             }
         } else {
-			db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
             CPU::int_enable();
             CPU::halt();
         }
