@@ -21,8 +21,6 @@ Alarm::Alarm(const Microsecond & time, Handler * handler, int times)
     db<Alarm>(TRC) << "Alarm(t=" << time << ",tk=" << _ticks << ",h=" << reinterpret_cast<void *>(handler)
                    << ",x=" << times << ") => " << this << endl;
 
-     _original_ticks = _ticks;
-
     if(_ticks) {
         _request.insert(&_link);
         unlock();
@@ -44,57 +42,57 @@ Alarm::~Alarm()
     unlock();
 }
 
+
 // Class methods
 void Alarm::delay(const Microsecond & time)
 {
     db<Alarm>(TRC) << "Alarm::delay(time=" << time << ")" << endl;
 
-	Semaphore semaphore(0);
-	Semaphore_Handler semaphore_handler(&semaphore);
-	Alarm alarm(time, &semaphore_handler, 1);
-	semaphore.p();
+    Semaphore semaphore(0);
+    Semaphore_Handler handler(&semaphore);
+    Alarm alarm(time, &handler, 1); // if time < tick trigger v()
+    semaphore.p();
 }
+
 
 void Alarm::handler(const IC::Interrupt_Id & i)
 {
-  lock();
-  Handler * handler = 0;
+    lock();
 
-  _elapsed++;
+    _elapsed++;
 
-  if(Traits<Alarm>::visible) {
-      Display display;
-      int lin, col;
-      display.position(&lin, &col);
-      display.position(0, 79);
-      display.putc(_elapsed);
-      display.position(lin, col);
-  }
-  if(!_request.empty()){
-    do {
-      Queue::Element * e = _request.head();
-  	  Alarm * alarm = e->object();
-      if(alarm->_ticks > 1)
-          alarm->_ticks--;
-      else {
-        handler = alarm->_handler;
-        _request.remove();
-        if(alarm->_times != -1)
-            alarm->_times--;
-        if(alarm->_times) {
-            alarm->_ticks = alarm->_original_ticks;
-            e->rank(alarm->_ticks);
-            _request.insert(e);
+    if(Traits<Alarm>::visible) {
+        Display display;
+        int lin, col;
+        display.position(&lin, &col);
+        display.position(0, 79);
+        display.putc(_elapsed);
+        display.position(lin, col);
+    }
+
+    Alarm * alarm = 0;
+
+    if(!_request.empty()) {
+        // Replacing the following "if" by a "while" loop is tempting, but recovering the lock and dispatching the handler is
+        // troublesome if the Alarm gets destroyed in between, like is the case for the idle thread returning to shutdown the machine
+        if(_request.head()->promote() <= 0) { // rank can be negative whenever multiple handlers get created for the same time tick
+            Queue::Element * e = _request.remove();
+            alarm = e->object();
+            if(alarm->_times != INFINITE)
+                alarm->_times--;
+            if(alarm->_times) {
+                e->rank(alarm->_ticks);
+                _request.insert(e);
+            }
         }
-      }
-      unlock();
-      if(handler) {
-        (*handler)();
-      }
-      lock();
-    } while(!_request.empty() && !_request.head()->object()->_ticks);
-  }
-  unlock();
+    }
+
+    unlock();
+
+    if(alarm) {
+        db<Alarm>(TRC) << "Alarm::handler(this=" << alarm << ",e=" << _elapsed << ",h=" << reinterpret_cast<void*>(alarm->handler) << ")" << endl;
+        (*alarm->_handler)();
+    }
 }
 
 __END_SYS

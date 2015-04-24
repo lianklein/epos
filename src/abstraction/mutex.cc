@@ -13,7 +13,6 @@ Mutex::Mutex(): _locked(false)
 Mutex::~Mutex()
 {
     db<Synchronizer>(TRC) << "~Mutex(this=" << this << ")" << endl;
-    unlock();
 }
 
 

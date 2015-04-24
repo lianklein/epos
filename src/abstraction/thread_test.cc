@@ -6,7 +6,7 @@
 
 using namespace EPOS;
 
-const int iterations = 20;
+const int iterations = 100;
 
 int func_a(void);
 int func_b(void);
@@ -30,18 +30,15 @@ int main()
     b = new Thread(&func_b);
 
     int status_a = a->join();
-
-    delete m;
-
     int status_b = b->join();
 
-    cout << "Thread A exited with status " << status_a
+    cout << "Thread A exited with status " << status_a 
          << " and thread B exited with status " << status_b << "" << endl;
 
     delete a;
     delete b;
     delete m;
-
+    
     cout << "It should not be shown on the display!" << endl;
 
     return 0;
@@ -49,30 +46,24 @@ int main()
 
 int func_a(void)
 {
-    for(int i = iterations/2; i > 0; i--) {
-        for(int i = 0; i < 76; i++)
+    for(int i = iterations; i > 0; i--) {
+        for(int i = 0; i < 79; i++)
             cout << "a";
-        cout << " ";
-        if(iterations < 10) {
-          cout << "0";
-        }
-        cout << i << endl;
+        cout << "" << endl;
         Alarm::delay(500000);
     }
-    return 'A';
+
+    return 'A';   
 }
 
 int func_b(void)
 {
-  for(int i = iterations; i > 0; i--) {
-      for(int i = 0; i < 76; i++)
-          cout << "b";
-      cout << " ";
-      if(iterations < 10) {
-        cout << "0";
-      }
-      cout << i << endl;
-      Alarm::delay(500000);
+    for(int i = iterations; i > 0; i--) {
+        for(int i = 0; i < 79; i++)
+            cout << "b";
+        cout << "" << endl;
+        Alarm::delay(500000);
     }
-    return 'B';
+
+    return 'B';   
 }

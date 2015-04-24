@@ -59,6 +59,9 @@ Thread::~Thread()
                     << ",context={b=" << _context
                     << "," << *_context << "})" << endl;
 
+    if(_state != FINISHING)
+        _thread_count--;
+
     _ready.remove(this);
     _suspended.remove(this);
 
@@ -70,13 +73,7 @@ Thread::~Thread()
 
     unlock();
 
-    if(_state != FINISHING){
-      exit(0);
-    }
-
     kfree(_stack);
-    db<Thread>(TRC) << "~Thread(this=" << this << ", KFREE)" << endl;
-
 }
 
 
@@ -174,7 +171,7 @@ void Thread::yield()
     _running->_state = RUNNING;
 
     dispatch(prev, _running);
-
+    
     unlock();
 }
 
@@ -201,7 +198,7 @@ void Thread::exit(int status)
     _running = _ready.remove()->object();
     _running->_state = RUNNING;
 
-    dispatch(prev, _running);
+    dispatch(prev, _running);    
 
     unlock();
 }
@@ -212,8 +209,6 @@ void Thread::sleep(Queue * q)
 
     // lock() must be called before entering this method
     assert(locked());
-
-    assert(!_ready.empty());
 
     Thread * prev = running();
     prev->_state = WAITING;
@@ -291,7 +286,6 @@ void Thread::implicit_exit()
 
 int Thread::idle()
 {
-
     while(true) {
         if(Traits<Thread>::trace_idle)
             db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
@@ -307,7 +301,6 @@ int Thread::idle()
                 CPU::halt();
             }
         } else {
-			db<Thread>(TRC) << "Thread::idle(this=" << running() << ")" << endl;
             CPU::int_enable();
             CPU::halt();
         }

@@ -7,33 +7,47 @@
 
 __BEGIN_UTIL
 
-typedef void (function)();
-
 class Handler
 {
-	public:
-		Handler(){};
-		~Handler(){};
-		virtual void operator()(){};
+public:
+    // A handler function
+    typedef void (Function)();
+
+public:
+    Handler() {}
+    virtual ~Handler() {}
+
+    virtual void operator()() = 0;
 };
 
-class Function_Handler : public Handler
+class Function_Handler: public Handler
 {
-	public:
-		Function_Handler (function * f)
-		{
-			_f = f;
-		}
-		~Function_Handler(){}
+public:
+    Function_Handler(Function * h): _handler(h) {}
+    ~Function_Handler() {}
 
-		void operator()()
-		{
-			_f();
-		};
+    void operator()() { _handler(); }
 
-		private:
-			function* _f;
+private:
+    Function * _handler;
 };
+
+template<typename T>
+class Functor_Handler: public Handler
+{
+public:
+    typedef void (Functor)(T *);
+
+    Functor_Handler(Functor * h, T * p): _handler(h), _ptr(p) {}
+    ~Functor_Handler() {}
+
+    void operator()() { _handler(_ptr); }
+
+private:
+    Functor * _handler;
+    T * _ptr;
+};
+
 
 __END_UTIL
 
