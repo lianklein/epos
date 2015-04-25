@@ -59,11 +59,7 @@ Thread::~Thread()
                     << ",context={b=" << _context
                     << "," << *_context << "})" << endl;
 
-    if(_state != FINISHING)
-	{
-        //_thread_count--;
-		exit(0);
-	}
+    _zombie = true;
 
     _ready.remove(this);
     _suspended.remove(this);
@@ -71,12 +67,27 @@ Thread::~Thread()
     if(_waiting)
         _waiting->remove(this);
 
-    if(_joining)
+    if(_joining) {
         _joining->resume();
+        _joining = 0;
+    }
 
     unlock();
 
     kfree(_stack);
+
+    lock();
+    if(_state != FINISHING){
+      _thread_count--;
+      _state = FINISHING;
+
+      if(this == _running){
+        _running = _ready.remove()->object();
+        _running->_state = RUNNING;
+        dispatch(this, _running);
+      }
+    }
+    unlock();
 }
 
 
@@ -164,7 +175,7 @@ void Thread::yield()
 {
     lock();
 
-    db<Thread>(TRC) << "Thread::yield(running=" << _running << ")" << endl;
+    db<Thread>(TRC) << "Thread::yield(running=" << _running << ", SUSPENDED=" << _suspended.head()->object() << ")" << endl;
 
     Thread * prev = _running;
     prev->_state = READY;
@@ -174,7 +185,7 @@ void Thread::yield()
     _running->_state = RUNNING;
 
     dispatch(prev, _running);
-    
+
     unlock();
 }
 
@@ -201,7 +212,7 @@ void Thread::exit(int status)
     _running = _ready.remove()->object();
     _running->_state = RUNNING;
 
-    dispatch(prev, _running);    
+    dispatch(prev, _running);
 
     unlock();
 }

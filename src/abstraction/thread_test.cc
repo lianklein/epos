@@ -6,7 +6,7 @@
 
 using namespace EPOS;
 
-const int iterations = 100;
+const int iterations = 10;
 
 int func_a(void);
 int func_b(void);
@@ -29,16 +29,18 @@ int main()
     a = new Thread(&func_a);
     b = new Thread(&func_b);
 
+    delete a;
+
     int status_a = a->join();
     int status_b = b->join();
 
-    cout << "Thread A exited with status " << status_a 
-         << " and thread B exited with status " << status_b << "" << endl;
+    cout << "Thread A exited with status " << status_a << endl;
+    cout << "Thread B exited with status " << status_b << endl;
 
-    delete a;
+    //delete a;
     delete b;
     delete m;
-    
+
     cout << "It should not be shown on the display!" << endl;
 
     return 0;
@@ -47,23 +49,23 @@ int main()
 int func_a(void)
 {
     for(int i = iterations; i > 0; i--) {
-        for(int i = 0; i < 79; i++)
+        for(int i = 0; i < 75; i++)
             cout << "a";
-        cout << "" << endl;
+        cout << " " << i << endl;
         Alarm::delay(500000);
     }
 
-    return 'A';   
+    return 'A';
 }
 
 int func_b(void)
 {
     for(int i = iterations; i > 0; i--) {
-        for(int i = 0; i < 79; i++)
+        for(int i = 0; i < 75; i++)
             cout << "b";
-        cout << "" << endl;
+            cout << " " << i << endl;
         Alarm::delay(500000);
     }
 
-    return 'B';   
+    return 'B';
 }

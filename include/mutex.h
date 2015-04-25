@@ -29,7 +29,10 @@ public:
     Mutex_Handler(Mutex * h) : _handler(h) {}
     ~Mutex_Handler() {}
 
-    void operator()() { _handler->unlock(); }
+    void operator()() {
+      if(_handler)
+        _handler->unlock();
+    }
 
 private:
     Mutex * _handler;

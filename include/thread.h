@@ -31,11 +31,11 @@ protected:
 public:
     // Thread State
     enum State {
-        RUNNING,
-        READY,
-        SUSPENDED,
-        WAITING,
-        FINISHING
+        RUNNING = 1,
+        READY = 2,
+        SUSPENDED= 3,
+        WAITING = 4,
+        FINISHING = 0
     };
 
     // Thread Priority
@@ -122,6 +122,7 @@ protected:
     Queue * _waiting;
     Thread * volatile _joining;
     Queue::Element _link;
+    bool _zombie;
 
     static volatile unsigned int _thread_count;
     static Scheduler_Timer * _timer;
