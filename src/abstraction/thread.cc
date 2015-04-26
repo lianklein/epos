@@ -59,8 +59,6 @@ Thread::~Thread()
                     << ",context={b=" << _context
                     << "," << *_context << "})" << endl;
 
-    _zombie = true;
-
     _ready.remove(this);
     _suspended.remove(this);
 

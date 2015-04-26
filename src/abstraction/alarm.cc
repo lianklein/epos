@@ -38,6 +38,7 @@ Alarm::~Alarm()
     db<Alarm>(TRC) << "~Alarm(this=" << this << ")" << endl;
 
     _request.remove(this);
+    delete _handler;
 
     unlock();
 }

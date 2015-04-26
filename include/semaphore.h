@@ -27,7 +27,7 @@ class Semaphore_Handler: public Handler
 {
 public:
     Semaphore_Handler(Semaphore * h) : _handler(h) {}
-    ~Semaphore_Handler() {}
+    ~Semaphore_Handler() { operator()(); }
 
     void operator()() {
       if(_handler)

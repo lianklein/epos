@@ -27,7 +27,7 @@ class Mutex_Handler: public Handler
 {
 public:
     Mutex_Handler(Mutex * h) : _handler(h) {}
-    ~Mutex_Handler() {}
+    ~Mutex_Handler() { operator()(); }
 
     void operator()() {
       if(_handler)

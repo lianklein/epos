@@ -31,10 +31,10 @@ protected:
 public:
     // Thread State
     enum State {
-        RUNNING = 1,
-        READY = 2,
-        SUSPENDED= 3,
-        WAITING = 4,
+        RUNNING   = 1,
+        READY     = 2,
+        SUSPENDED = 3,
+        WAITING   = 4,
         FINISHING = 0
     };
 
@@ -122,7 +122,6 @@ protected:
     Queue * _waiting;
     Thread * volatile _joining;
     Queue::Element _link;
-    bool _zombie;
 
     static volatile unsigned int _thread_count;
     static Scheduler_Timer * _timer;
@@ -160,9 +159,12 @@ class Thread_Handler : public Handler
 {
 public:
     Thread_Handler(Thread * h) : _handler(h) {}
-    ~Thread_Handler() {}
+    ~Thread_Handler() { operator()(); }
 
-    void operator()() { _handler->resume(); }
+    void operator()() {
+      if(_handler)
+        _handler->resume();
+    }
 
 private:
     Thread * _handler;
