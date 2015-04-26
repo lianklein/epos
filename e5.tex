@@ -1,0 +1,95 @@
+\documentclass[12pt]{relatorio}
+
+\universidade{Universidade Federal de Santa Catarina}
+\departamento{Departamento de Informática e Estatística}
+\curso{Ciência da Computação}
+\disciplina{INE5424 - Sistemas Operacionais II}
+\titulo{E5: System Object Destruction}
+
+\author{
+Douglas Klein \\ 08132015
+\and
+João Marcus Alves \\ 07132067
+\and
+Maurílio Átila \\ 10100760
+}
+
+
+\begin{document}
+
+\maketitle
+
+
+\section{To do}
+
+Modify the implementation of this didactic version of OpenEPOS such that the delete C++ operation preserves system consistency at the same time it honors the programming language semantics.
+
+\newpage
+
+\section{Resolução}
+\subsection{Synchronizer\_Common, Mutex e Semáforo}
+
+\begin{lstlisting}
+~Synchronizer_Common()
+{
+  begin_atomic();
+  wakeup_all();
+}
+\end{lstlisting}
+
+O método destrutor de Synchronizer\_Common acorda todas as threads bloqueadas pelo objeto que a chamou.
+
+Por exemplo, em Alarm::delay, se o semáforo (que extende Synchronizer\_Common) for destruído, a thread que está esperando é acordada e volta a executar.
+
+\subsection{Handler, Semaphore\_Handler, Mutex\_Handler}
+
+\begin{lstlisting}
+class Semaphore_Handler: public Handler
+{
+public:
+  Semaphore_Handler(Semaphore * h) : _handler(h) {}
+  ~Semaphore_Handler() {}
+
+  void operator()() {
+    if(_handler)
+      _handler->v();
+  }
+
+private:
+  Semaphore * _handler;
+};
+\end{lstlisting}
+
+Caso um semáforo que esteja integrante de um Semaphore\_Handler não exista ou tenha sido destruído, a ação ``call" dele deve ser inócua. Para tanto, verificamos se o semáforo existe antes de ativá-lo. O mesmo tratamento é feito no Mutex\_Handler.
+
+\newpage
+
+\subsection{Thread}
+
+\begin{lstlisting}
+Thread::~Thread()
+{
+  lock();
+  if(_state != FINISHING)
+    exit(0);
+
+  _ready.remove(this);
+  _suspended.remove(this);
+
+  if(_waiting)
+    _waiting->remove(this);
+
+  if(_joining)
+    _joining->resume();
+
+    unlock();
+    kfree(_stack);
+}
+
+
+\end{lstlisting}
+A nossa abordagem parte do ponto que uma thread removida não pode executar nenhuma função. Se houve o delete a thread passa ser uma zumbi.
+
+
+
+\end{document}

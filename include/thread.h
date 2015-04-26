@@ -31,11 +31,11 @@ protected:
 public:
     // Thread State
     enum State {
-        RUNNING,
-        READY,
-        SUSPENDED,
-        WAITING,
-        FINISHING
+        RUNNING   = 1,
+        READY     = 2,
+        SUSPENDED = 3,
+        WAITING   = 4,
+        FINISHING = 0
     };
 
     // Thread Priority
@@ -159,9 +159,12 @@ class Thread_Handler : public Handler
 {
 public:
     Thread_Handler(Thread * h) : _handler(h) {}
-    ~Thread_Handler() {}
+    ~Thread_Handler() { operator()(); }
 
-    void operator()() { _handler->resume(); }
+    void operator()() {
+      if(_handler)
+        _handler->resume();
+    }
 
 private:
     Thread * _handler;
