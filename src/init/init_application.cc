@@ -11,15 +11,17 @@ class Init_Application
 {
 public:
     Init_Application() {
-        db<Init>(TRC) << "Init_Application()" << endl;
+      db<Init>(TRC) << "Init_Application()" << endl;
 
-	// Initialize Application's heap
-	db<Init>(INF) << "Initializing application's heap" << endl;
-	Application::_heap = new (&Application::_preheap[0]) Heap(MMU::alloc(MMU::pages(Traits<Application>::HEAP_SIZE)), Traits<Application>::HEAP_SIZE);
+	    // Initialize Application's heap
+	    db<Init>(INF) << "Initializing application's heap" << endl;
+      Application::_heap = new (&Application::_preheap[0]) Heap(MMU::alloc(MMU::pages(Traits<Application>::HEAP_SIZE)), Traits<Application>::HEAP_SIZE);
+      Application::_uncached_heap = new (&Application::_uncached_preheap[0]) Heap(MMU::alloc(MMU::pages(Traits<Application>::HEAP_SIZE)), Traits<Application>::HEAP_SIZE);
 
-	db<Init>(INF) << "done!" << endl;
+      db<Init>(INF) << "done!" << endl;
     }
 };
+
 
 // Global object "init_application"  must be linked to the application (not
 // to the system) and there constructed at first.

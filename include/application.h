@@ -26,10 +26,14 @@ private:
 
 private:
     static char _preheap[sizeof(Heap)];
+    static char _uncached_preheap[sizeof(Heap)];
     static Heap * _heap;
+    static Heap * _uncached_heap;
 };
 
 __END_SYS
+
+
 
 #include <utility/malloc.h>
 

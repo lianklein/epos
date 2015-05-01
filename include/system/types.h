@@ -5,8 +5,21 @@ typedef __SIZE_TYPE__ size_t;
 #ifndef __types_h
 #define __types_h
 
+__BEGIN_SYS
+
+enum Heap_System { SYSTEM };
+enum Heap_Uncached { UNCACHED };
+
+__END_SYS
+
 inline void * operator new(size_t s, void * a) { return a; }
 inline void * operator new[](size_t s, void * a) { return a; }
+
+inline void * operator new(size_t s, const EPOS::Heap_System &);
+inline void * operator new[](size_t s, const EPOS::Heap_System &);
+
+//inline void * operator new(size_t s, const EPOS::Heap_Uncached a);
+//inline void * operator new[](size_t s, const EPOS::Heap_Uncached a);
 
 // Utilities
 __BEGIN_UTIL
@@ -81,7 +94,7 @@ class Delay;
 // System Components IDs
 // The order in this enumeration defines many things in the system (e.g. init)
 typedef unsigned int Type_Id;
-enum 
+enum
 {
     CPU_ID = 0,
     TSC_ID,

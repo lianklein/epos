@@ -12,7 +12,7 @@ extern "C"
 
     // Standard C Library allocators
     inline void * malloc(size_t bytes) {
-	return Application::_heap->alloc(bytes);
+	      return Application::_heap->alloc(bytes);
     }
 
     inline void * calloc(size_t n, unsigned int bytes) {
@@ -34,6 +34,10 @@ inline void * operator new(size_t bytes) {
 inline void * operator new[](size_t bytes) {
     return malloc(bytes);
 }
+
+
+
+
 
 // Delete cannot be declared inline due to virtual destructors
 void operator delete(void * ptr);

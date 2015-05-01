@@ -19,6 +19,8 @@ class System
     friend class Init_Application;
     friend void * kmalloc(size_t);
     friend void kfree(void *);
+    friend void * ::operator new(size_t, const EPOS::Heap_System &);
+    friend void * ::operator new[](size_t, const EPOS::Heap_System &);
 
 public:
     static System_Info<Machine> * const info() { return _si; }
@@ -33,5 +35,13 @@ private:
 };
 
 __END_SYS
+
+inline void * operator new(size_t bytes, const EPOS::Heap_System & heap){
+    return EPOS::System::_heap->alloc(bytes);
+}
+
+inline void * operator new[](size_t bytes, const EPOS::Heap_System & heap){
+    return EPOS::System::_heap->alloc(bytes);
+}
 
 #endif

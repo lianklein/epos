@@ -14,7 +14,7 @@ extern "C" {
     }
 
     void _exit(int s) {
-        EPOS::Thread::exit(s); for(;;);
+        EPOS::Thread::exit(s);
     }
 
     void _print(const char * s) {
@@ -28,7 +28,7 @@ extern "C" {
 
 __BEGIN_SYS
 
-// This class purpose is simply to define a well-known entry point for 
+// This class purpose is simply to define a well-known entry point for
 // the system. It must be declared as the first global object in
 // system_scaffold.cc
 class First_Object

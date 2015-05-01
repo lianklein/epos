@@ -6,7 +6,9 @@
 // Application class attributes
 __BEGIN_SYS
 char Application::_preheap[];
+char Application::_uncached_preheap[];
 Heap * Application::_heap;
+Heap * Application::_uncached_heap;
 __END_SYS
 
 // Global objects
