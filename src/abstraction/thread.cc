@@ -1,6 +1,5 @@
 // EPOS Thread Abstraction Implementation
 
-#include <system/kmalloc.h>
 #include <machine.h>
 #include <thread.h>
 #include <alarm.h>
@@ -59,24 +58,35 @@ Thread::~Thread()
                     << ",context={b=" << _context
                     << "," << *_context << "})" << endl;
 
-    if(_state != FINISHING)
-	{
-        //_thread_count--;
-		exit(0);
-	}
+    // The running thread cannot delete itself!
+    assert(_state != RUNNING);
 
-    _ready.remove(this);
-    _suspended.remove(this);
-
-    if(_waiting)
+    switch(_state) {
+    case RUNNING:  // For switch completion only: the running thread would have deleted itself! Stack wouldn't have been released!
+        exit(-1);
+        break;
+    case READY:
+        _ready.remove(this);
+        _thread_count--;
+        break;
+    case SUSPENDED:
+        _suspended.remove(this);
+        _thread_count--;
+        break;
+    case WAITING:
         _waiting->remove(this);
+        _thread_count--;
+        break;
+    case FINISHING: // Already called exit()
+        break;
+    }
 
     if(_joining)
         _joining->resume();
 
     unlock();
 
-    kfree(_stack);
+    delete _stack;
 }
 
 
@@ -174,7 +184,7 @@ void Thread::yield()
     _running->_state = RUNNING;
 
     dispatch(prev, _running);
-    
+
     unlock();
 }
 
@@ -201,7 +211,7 @@ void Thread::exit(int status)
     _running = _ready.remove()->object();
     _running->_state = RUNNING;
 
-    dispatch(prev, _running);    
+    dispatch(prev, _running);
 
     unlock();
 }

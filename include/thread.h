@@ -7,7 +7,6 @@
 #include <utility/handler.h>
 #include <cpu.h>
 #include <machine.h>
-#include <system/kmalloc.h>
 
 __BEGIN_SYS
 
@@ -138,7 +137,7 @@ inline Thread::Thread(int (* entry)(Tn ...), Tn ... an)
 : _state(READY), _waiting(0), _joining(0), _link(this, NORMAL)
 {
     lock();
-    _stack = reinterpret_cast<char *>(kmalloc(STACK_SIZE));
+    _stack = new (SYSTEM) char[STACK_SIZE];
     _context = CPU::init_stack(_stack, STACK_SIZE, &implicit_exit, entry, an ...);
     constructor(entry, STACK_SIZE); // implicit unlock
 }
@@ -148,7 +147,7 @@ inline Thread::Thread(const Configuration & conf, int (* entry)(Tn ...), Tn ... 
 : _state(conf.state), _waiting(0), _joining(0), _link(this, conf.priority)
 {
     lock();
-    _stack = reinterpret_cast<char *>(kmalloc(conf.stack_size));
+    _stack = new (SYSTEM) char[conf.stack_size];
     _context = CPU::init_stack(_stack, conf.stack_size, &implicit_exit, entry, an ...);
     constructor(entry, conf.stack_size); // implicit unlock
 }

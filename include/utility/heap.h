@@ -36,6 +36,7 @@ public:
             while((bytes % sizeof(void *)))
                 ++bytes;
 
+        bytes += sizeof(void*);       // pointer to heap
         bytes += sizeof(int);         // add room for size
         if(bytes < sizeof(Element))
             bytes = sizeof(Element);
@@ -49,6 +50,7 @@ public:
         int * addr = reinterpret_cast<int *>(e->object() + e->size());
 
         *addr++ = bytes;
+        *addr++ = reinterpret_cast<int>(this);
 
         db<Heaps>(TRC) << ") => " << reinterpret_cast<void *>(addr) << endl;
 
@@ -65,10 +67,12 @@ public:
         }
     }
 
-    void free(void * ptr) {
+    static void free(void * ptr) {
         int * addr = reinterpret_cast<int *>(ptr);
+        Heap * heap = reinterpret_cast<Heap*>(*--addr);
         unsigned int bytes = *--addr;
-        free(addr, bytes);
+
+        heap->free(addr, bytes);
     }
 
 private:

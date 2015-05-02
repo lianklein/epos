@@ -58,7 +58,7 @@ template<> struct Traits<PC_PCI>: public Traits<PC_Common>
 
 template<> struct Traits<PC_IC>: public Traits<PC_Common>
 {
-    static const bool debugged = true;
+    static const bool debugged = hysterically_debugged;
 };
 
 template<> struct Traits<PC_Timer>: public Traits<PC_Common>

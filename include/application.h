@@ -20,16 +20,29 @@ class Application
     friend void ::free(void *);
     friend void ::operator delete(void *);
     friend void ::operator delete[](void *);
+    friend void * ::operator new(size_t, const EPOS::Heap_Uncached &);
+    friend void * ::operator new[](size_t, const EPOS::Heap_Uncached &);
 
 private:
     static void init();
 
 private:
     static char _preheap[sizeof(Heap)];
+    static char _uncached_preheap[sizeof(Heap)];
     static Heap * _heap;
+    static Heap * _uncached_heap;
 };
 
 __END_SYS
+
+inline void * operator new(size_t bytes, const EPOS::Heap_Uncached & heap){
+    return EPOS::Application::_uncached_heap->alloc(bytes);
+}
+
+inline void * operator new[](size_t bytes, const EPOS::Heap_Uncached & heap){
+    return EPOS::Application::_uncached_heap->alloc(bytes);
+}
+
 
 #include <utility/malloc.h>
 
