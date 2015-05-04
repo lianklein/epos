@@ -125,7 +125,7 @@ public:
     {
     public:
         Chunk() {}
-        
+
         Chunk(unsigned int bytes, Flags flags): _from(0), _to(pages(bytes)), _pts(page_tables(_to - _from)), _flags(IA32_Flags(flags)), _pt(calloc(_pts)) {
             if(flags & IA32_Flags::CT)
         	_pt->map_contiguous(_from, _to, _flags);

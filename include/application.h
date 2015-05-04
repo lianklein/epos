@@ -28,18 +28,19 @@ private:
 
 private:
     static char _preheap[sizeof(Heap)];
-    static char _uncached_preheap[sizeof(Heap)];
     static Heap * _heap;
+
+    static char _uncached_preheap[sizeof(Heap)];
     static Heap * _uncached_heap;
 };
 
 __END_SYS
 
-inline void * operator new(size_t bytes, const EPOS::Heap_Uncached & heap){
+inline void * operator new(size_t bytes, const EPOS::Heap_Uncached &){
     return EPOS::Application::_uncached_heap->alloc(bytes);
 }
 
-inline void * operator new[](size_t bytes, const EPOS::Heap_Uncached & heap){
+inline void * operator new[](size_t bytes, const EPOS::Heap_Uncached &){
     return EPOS::Application::_uncached_heap->alloc(bytes);
 }
 

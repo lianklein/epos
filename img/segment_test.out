@@ -1,0 +1,21 @@
+Setting up this machine as follows: 
+  Processor:    IA32 at 1597 MHz (BUS clock = 125 MHz)
+  Memory:       262144 Kbytes [0x00000000:0x10000000]
+  User memory:  261800 Kbytes [0x00000000:0x0ffaa000]
+  PCI aperture: 45064 Kbytes [0xfc000000:0xfec02000]
+  Node Id:      will get from the network!
+  Setup:        18944 bytes
+  APP code:     18864 bytes	data: 16797696 bytes
+Segment test
+My address space's page directory is located at 0x0fffc000
+Creating two extra data segments:
+  extra segment 1 => 10000 bytes, done!
+  extra segment 2 => 100000 bytes, done!
+Attaching segments:
+  extra segment 1 => 0x12000000 done!
+  extra segment 2 => 0x12400000 done!
+Clearing segments:  done!
+Detaching segments:  done!
+Deleting segments:  done!
+The last thread has exited!
+Rebooting the machine ...

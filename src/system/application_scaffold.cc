@@ -7,7 +7,6 @@
 __BEGIN_SYS
 
 char Application::_preheap[];
-char Application::_uncached_preheap[];
 Heap * Application::_heap;
 
 char Application::_uncached_preheap[];

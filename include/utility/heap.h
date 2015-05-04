@@ -36,7 +36,7 @@ public:
             while((bytes % sizeof(void *)))
                 ++bytes;
 
-        bytes += sizeof(void*);       // pointer to heap
+        bytes += sizeof(Heap*);       // pointer to heap
         bytes += sizeof(int);         // add room for size
         if(bytes < sizeof(Element))
             bytes = sizeof(Element);
