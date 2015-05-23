@@ -3,6 +3,8 @@
 #include <utility/random.h>
 #include <machine.h>
 #include <system.h>
+#include <address_space.h>
+#include <segment.h>
 
 extern "C" { void __epos_library_app_entry(void); }
 
@@ -10,6 +12,9 @@ __BEGIN_SYS
 
 class Init_System
 {
+private:
+    static const unsigned int HEAP_SIZE = Traits<System>::HEAP_SIZE;
+
 public:
     Init_System() {
         db<Init>(TRC) << "Init_System()" << endl;
@@ -21,7 +26,11 @@ public:
 
         // Initialize System's heap
         db<Init>(INF) << "Initializing system's heap: " << endl;
-	System::_heap = new (&System::_preheap[0]) Heap(MMU::alloc(MMU::pages(Traits<System>::HEAP_SIZE)), Traits<System>::HEAP_SIZE);
+        if(Traits<System>::multiheap) {
+            System::_heap_segment = new (&System::_preheap[0]) Segment(HEAP_SIZE);
+            System::_heap = new (&System::_preheap[sizeof(Segment)]) Heap(Address_Space(MMU::current()).attach(*System::_heap_segment, Memory_Map<Machine>::SYS_HEAP), System::_heap_segment->size());
+        } else
+            System::_heap = new (&System::_preheap[0]) Heap(MMU::alloc(MMU::pages(HEAP_SIZE)), HEAP_SIZE);
         db<Init>(INF) << "done!" << endl;
 
         // Initialize the machine

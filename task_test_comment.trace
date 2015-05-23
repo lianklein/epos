@@ -1,0 +1,723 @@
+make --print-directory run1
+make[1]: Entrando no diretório `/home/douglas/epos'
+
+
+#
+# ETC
+#
+
+(cd etc && make --print-directory)
+make[2]: Entrando no diretório `/home/douglas/epos/etc'
+	sed -e 's/^#define MODE.*$/#define MODE builtin/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define ARCH.*$/#define ARCH ia32/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define MACH.*$/#define MACH pc/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define MMOD.*$/#define MMOD legacy/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define APPL.*$/#define APPL task_test/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define __mode_.*__$/#define __mode_builtin__/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define __arch_.*__$/#define __arch_ia32__/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define __mach_.*__$/#define __mach_pc__/' -i /home/douglas/epos/include/system/config.h
+	sed -e 's/^#define __mmod_.*__$/#define __mmod_legacy__/' -i /home/douglas/epos/include/system/config.h
+make[2]: Saindo do diretório `/home/douglas/epos/etc'
+
+#
+# TOOLS
+#
+
+(cd tools && make --print-directory)
+make[2]: Entrando no diretório `/home/douglas/epos/tools'
+
+	#
+	# TOOLS/EPOSCC
+	# copia o "eposcc" para a pasta /bin
+
+	(cd eposcc && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/tools/eposcc'
+		install -m 775 eposcc /home/douglas/epos/bin
+		sed -e 's/^EPOS=.*$/EPOS=\/home\/douglas\/epos/' -i /home/douglas/epos/bin/eposcc
+	make[3]: Saindo do diretório `/home/douglas/epos/tools/eposcc'
+
+	#
+	# TOOLS/EPOSMBKI
+	# compila o eposmbki.cc e copia para /bin (-m32 alinhamento 32 bits)
+
+	(cd eposmkbi && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/tools/eposmkbi'
+		g++ -c -ansi -fno-exceptions -std=c++0x -m32 -Wall -O2 -I/home/douglas/epos/include eposmkbi.cc
+		gcc -m32 -o eposmkbi eposmkbi.o
+		install -m 775 eposmkbi /home/douglas/epos/bin
+	make[3]: Saindo do diretório `/home/douglas/epos/tools/eposmkbi'
+make[2]: Saindo do diretório `/home/douglas/epos/tools'
+
+#
+# SRC
+#
+
+(cd src && make --print-directory)
+make[2]: Entrando no diretório `/home/douglas/epos/src'
+
+	#
+	# SRC/UTILITY
+	# gera a biblioteca /lib/libutil_ia32.a com elf, heap, malloc, ostream, random, srec, string
+
+	(cd utility && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/utility'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include elf.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a elf.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include heap.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a heap.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include malloc.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a malloc.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include ostream.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a ostream.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include random.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a random.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include srec.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a srec.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include string.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libutil_ia32.a string.o
+	make[3]: Saindo do diretório `/home/douglas/epos/src/utility'
+
+	#
+	# SRC/ARCHITECTURE
+	#
+
+	(cd architecture && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/architecture'
+
+		#
+		# SRC/ARCHITECTURE/IA32
+		# compila ia32_crt0, ia32_crtbegin, ia32_crtend e compila para ./lib
+		# gera a biblioteca /lib/libarch_ia32.a com cpu, mmu, cpu_init, mmu_init
+
+		(cd ia32 && make --print-directory)
+		make[4]: Entrando no diretório `/home/douglas/epos/src/architecture/ia32'
+
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -E -Wa,--32 -I/home/douglas/epos/include ia32_crt0.S -o ia32_crt0.s
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-as --32 ia32_crt0.s -o ia32_crt0.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -ansi -c  -Wa,--32 -O2 -nostdinc -Wall -Werror -I/home/douglas/epos/include ia32_crtbegin.c
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -ansi -c  -Wa,--32 -O2 -nostdinc -Wall -Werror -I/home/douglas/epos/include ia32_crtend.c
+			install ia32_crt0.o ia32_crtbegin.o ia32_crtend.o /home/douglas/epos/lib
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include -fomit-frame-pointer cpu.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libarch_ia32.a cpu.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include mmu.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libarch_ia32.a mmu.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include cpu_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a cpu_init.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include mmu_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a mmu_init.o
+		make[4]: Saindo do diretório `/home/douglas/epos/src/architecture/ia32'
+	make[3]: Saindo do diretório `/home/douglas/epos/src/architecture'
+
+	#
+	# SRC/MACHINE
+	#
+
+	(cd machine && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/machine'
+
+		#
+		# SRC/MACHINE/COMMON
+		#
+
+		(cd common && make --print-directory)
+		make[4]: Entrando no diretório `/home/douglas/epos/src/machine/common'
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include rtc_common.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a rtc_common.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include scratchpad_common.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a scratchpad_common.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include serial_display.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a serial_display.o
+		make[4]: Saindo do diretório `/home/douglas/epos/src/machine/common'
+
+		#
+		# SRC/MACHINE/PC
+		#
+
+		(cd pc && make --print-directory)
+		make[4]: Entrando no diretório `/home/douglas/epos/src/machine/pc'
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include display.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a display.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include ic.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a ic.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include -fomit-frame-pointer ic_entry.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a ic_entry.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include info.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a info.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include machine.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a machine.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include pci.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a pci.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include rtc.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a rtc.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include timer.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libmach_ia32.a timer.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include ic_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a ic_init.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include machine_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a machine_init.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include pci_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a pci_init.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include scratchpad_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a scratchpad_init.o
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include timer_init.cc
+			/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a timer_init.o
+		make[4]: Saindo do diretório `/home/douglas/epos/src/machine/pc'
+	make[3]: Saindo do diretório `/home/douglas/epos/src/machine'
+
+	#
+	# SRC/ABSTRACTION
+	#
+
+	(cd abstraction && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/abstraction'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include address_space.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a address_space.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include alarm.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a alarm.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include condition.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a condition.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include mutex.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a mutex.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include segment.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a segment.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include semaphore.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a semaphore.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include task.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a task.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include thread.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libsys_ia32.a thread.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include alarm_init.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a alarm_init.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include system_init.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a system_init.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include thread_init.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ar rcs /home/douglas/epos/lib/libinit_ia32.a thread_init.o
+	make[3]: Saindo do diretório `/home/douglas/epos/src/abstraction'
+
+	#
+	# SRC/SETUP
+	#
+
+	(cd setup && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/setup'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++
+						-c
+						--no-exceptions
+						--no-rtti
+						--no-use-cxa-atexit
+						-std=c++0x
+						-Wa,
+						--32
+						-O2
+						-nostdinc
+						-Wall
+						-Werror
+						-fdata-sections
+						-ffunction-sections
+						-I/home/douglas/epos/include
+						pc_setup.cc
+
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ld
+						-nostdlib
+						-L/home/douglas/epos/lib
+						-Bstatic
+						-L`/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -ansi -c  -Wa,--32 -print-file-name=`
+						--omagic
+						--section-start .init=0x00100000
+						-o pc_setup
+						pc_setup.o
+						-linit_ia32
+						-lmach_ia32
+						-larch_ia32
+						-lutil_ia32
+						-lgcc
+		install pc_setup /home/douglas/epos/img
+	make[3]: Saindo do diretório `/home/douglas/epos/src/setup'
+
+	#
+	# SRC/BOOT
+	#
+
+	(cd boot && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/boot'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -E -Wa,--32 -I/home/douglas/epos/include pc_boot.S -o pc_boot.s
+		sed -e 's/^ELF_HDR_SIZE =.*$/ELF_HDR_SIZE = 0x00000060/' -i pc_boot.s
+		as86 -0 -o pc_boot.o pc_boot.s
+		ld86 -0 -s -T 0x00007c00 -o pc_boot pc_boot.o
+		dd if=pc_boot of=pc_boot.tmp ibs=32 skip=1 obs=512 >& /dev/null
+		install pc_boot.tmp /home/douglas/epos/img/pc_boot
+		rm -f pc_boot.tmp
+	make[3]: Saindo do diretório `/home/douglas/epos/src/boot'
+
+	#
+	# SRC/SYSTEM
+	#
+
+	(cd system && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/system'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include application_scaffold.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include system_scaffold.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ld  -nostdlib -L/home/douglas/epos/lib -Bstatic -L`/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -ansi -c  -Wa,--32 -print-file-name=` --nmagic \
+				--section-start .init=0xff700000 \
+				--section-start .ctors=0xff740000 \
+				--entry=_init -o pc_system \
+				/home/douglas/epos/lib/ia32_crtbegin.o \
+				system_scaffold.o \
+				/home/douglas/epos/lib/ia32_crtend.o \
+				--whole-archive \
+				-lsys_ia32 -lmach_ia32 -larch_ia32 \
+				--no-whole-archive \
+				-lutil_ia32 -lgcc
+		install application_scaffold.o pc_application.o
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-objcopy -L _end pc_system
+		install pc_system /home/douglas/epos/img
+		install pc_application.o /home/douglas/epos/lib
+	make[3]: Saindo do diretório `/home/douglas/epos/src/system'
+
+	#
+	# SRC/INIT
+	#
+
+	(cd init && make --print-directory)
+	make[3]: Entrando no diretório `/home/douglas/epos/src/init'
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include init_application.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include init_first.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-g++ -c --no-exceptions --no-rtti --no-use-cxa-atexit -std=c++0x -Wa,--32 -O2 -nostdinc -Wall -Werror -fdata-sections -ffunction-sections -I/home/douglas/epos/include init_system.cc
+		/usr/local/ia32/gcc-4.4.4/bin/ia32-ld  -nostdlib -L/home/douglas/epos/lib -Bstatic -L`/usr/local/ia32/gcc-4.4.4/bin/ia32-gcc -ansi -c  -Wa,--32 -print-file-name=` --omagic \
+				--section-start .init=0x00200000 \
+				--entry=_init -o pc_init \
+				/home/douglas/epos/lib/ia32_crtbegin.o \
+				init_first.o init_system.o \
+				/home/douglas/epos/lib/ia32_crtend.o \
+				-linit_ia32 \
+				-R /home/douglas/epos/src/system/pc_system \
+				-lutil_ia32 -lgcc
+		install init_application.o pc_init_application.o
+		install pc_init /home/douglas/epos/img
+		install pc_init_application.o /home/douglas/epos/lib
+	make[3]: Saindo do diretório `/home/douglas/epos/src/init'
+make[2]: Saindo do diretório `/home/douglas/epos/src'
+
+#
+# APP
+#
+
+(cd app && make --print-directory)
+make[2]: Entrando no diretório `/home/douglas/epos/app'
+	/home/douglas/epos/bin/eposcc -Wa,--32 -c -ansi -O2  -o task_test.o task_test.cc
+
+	/usr/local/ia32/gcc-4.4.4/bin/ia32-g++
+				-Wa,
+				--32
+				-c
+				-ansi
+				-O2
+				--no-exceptions
+				--no-rtti
+				--no-use-cxa-atexit
+				-std=c++0x
+				-include /home/douglas/epos/include/utility/malloc.h
+				-I/home/douglas/epos/include
+				-o task_test.o
+				-DCONFIG_KEYS=\"/home/douglas/epos/app/task_test.key\"
+				task_test.cc
+
+	/home/douglas/epos/bin/eposcc --builtin  --gc-sections  -o task_test task_test.o
+
+	/usr/local/ia32/gcc-4.4.4/bin/ia32-ld
+				--gc-sections
+				-L/home/douglas/epos/lib
+				-L/usr/local/ia32/gcc-4.4.4/lib/gcc/i686-elf/4.4.4/
+				-static
+				--nmagic
+				--section-start .init=0x00000000
+				--section-start .ctors=0x00400000
+				-o task_test
+				/home/douglas/epos/lib/ia32_crt0.o
+				/home/douglas/epos/lib/ia32_crtbegin.o
+				/home/douglas/epos/lib/pc_init_application.o
+				/home/douglas/epos/lib/pc_application.o
+				task_test.o /home/douglas/epos/lib/ia32_crtend.o
+				-R/home/douglas/epos/src/system/pc_system
+				-lutil_ia32
+				-lgcc
+
+	install task_test /home/douglas/epos/img
+make[2]: Saindo do diretório `/home/douglas/epos/app'
+
+#
+# IMG
+#
+
+(cd img && make --print-directory)
+make[2]: Entrando no diretório `/home/douglas/epos/img'
+	/home/douglas/epos/bin/eposmkbi /home/douglas/epos task_test.img task_test
+
+	EPOS bootable image tool
+
+	  EPOS mode: builtin
+	  Machine: pc
+	  Model: legacy
+	  Processor: ia32 (32 bits, little-endian)
+	  Memory: 262144 KBytes
+	  Boot Length: 128 - 512 (min - max) KBytes
+	  Node id: will get from the network
+
+	  Creating EPOS bootable image in "task_test.img":
+	    Adding boot strap "/home/douglas/epos/img/pc_boot": done.
+	    Adding setup "/home/douglas/epos/img/pc_setup": done.
+	    Adding init "/home/douglas/epos/img/pc_init": done.
+	    Adding system "/home/douglas/epos/img/pc_system": done.
+	    Adding application "task_test": done.
+	    Adding system info: done.
+
+	  Adding specific boot features of "pc": done.
+
+	  Image successfully generated (158644 bytes)!
+
+	make[2]: Saindo do diretório `/home/douglas/epos/img'
+
+
+#
+# EXECUTA IMAGEM PELO QEMU
+#
+
+(cd img && make --print-directory run)
+make[2]: Entrando no diretório `/home/douglas/epos/img'
+qemu-system-i386 -smp 1 -m 262144k -nographic -no-reboot -fda  task_test.img | tee task_test.out
+
+System_Info={
+
+Boot_Map={
+n_cpus=1,
+mem_base=0x00000000,
+mem_top=0x10000000,
+io_base=0x00000000,
+io_top=0x00000000,
+node_id=-1,
+img_size=158132,
+setup_offset=0x200,
+init_offset=0x8b68,
+system_offset=0xe340,
+application_offset=0x24be8,
+extras_offset=-1
+}
+
+Physical_Memory_Map={mem_base=0x01010101,mem_top=0x01010101,io_base=0x01010101,i
+o_top=0x01010101,ext_base=0x01010101,ext_top=0x01010101,idt=0x01010101,gdt=0x010
+10101,sys_pt=0x01010101,sys_pd=0x01010101,sys_info=0x01010101,phy_mem_pts=0x0101
+0101,io_pts=0x01010101,sys_code=0x01010101,sys_data=0x01010101,sys_stack=0x01010
+101,free1_base=0x01010101,free1_top=0x01010101,free2_base=0x01010101,free2_top=0
+x01010101,free3_base=0x01010101,free3_top=0x01010101}
+
+Load_Map={
+has_stp=1,
+has_ini=1,
+has_sys=1,
+has_app=1,
+has_ext=1,
+
+stp_entry=0x01010101,
+stp_segments=16843009,
+stp_code=0x01010101,
+stp_code_size=16843009,
+stp_data=0x01010101,
+stp_data_size=16843009,
+
+ini_entry=0x01010101,
+ini_segments=16843009,
+ini_code=0x01010101,
+ini_code_size=16843009,
+ini_data=0x01010101,
+ini_data_size=16843009,
+
+sys_entry=0x01010101,
+sys_segments=16843009,
+sys_code=0x01010101,
+sys_code_size=16843009,
+sys_data=0x01010101,
+sys_data_size=16843009,
+sys_stack=0x01010101,
+sys_stack_size=16843009,
+
+app_entry=0x01010101,
+app_segments=16843009,
+app_code=0x01010101,
+app_code_size=16843009,
+app_data=0x01010101,
+app_stack=0x01010101,
+app_heap=0x01010101,
+app_data_size=16843009,
+app_extra=0x01010101,
+app_extra_size=16843009
+}
+
+Time_Map={cpu_clock=16843009,bus_clock=16843009}}
+Memory={base=0x00000000,top=0x10000000}
+PC_Setup::calibrate_timers:CPU clock=1597 MHz
+PC_Setup::calibrate_timers:BUS clock=125 MHz
+PCI[0:0.0]={vnd_id=0x00008086,dev_id=0x00001237,cmd=0x00000103,stat=0x00000000}
+PCI[0:1.0]={vnd_id=0x00008086,dev_id=0x00007000,cmd=0x00000103,stat=0x00000200}
+PCI[0:1.1]={vnd_id=0x00008086,dev_id=0x00007010,cmd=0x00000103,stat=0x00000280}
+  reg[4]={io,phy=0x0000c040,size=0x00000010}
+PCI[0:1.3]={vnd_id=0x00008086,dev_id=0x00007113,cmd=0x00000103,stat=0x00000280}
+PCI[0:2.0]={vnd_id=0x00001013,dev_id=0x000000b8,cmd=0x00000103,stat=0x00000000}
+  reg[0]={mem,phy=0xfc000000,log=0xec011000,size=0x02000000}
+  reg[1]={mem,phy=0xfebf0000,log=0xeec01000,size=0x00001000}
+PCI[0:3.0]={vnd_id=0x00008086,dev_id=0x0000100e,cmd=0x00000103,stat=0x00000000}
+  reg[0]={mem,phy=0xfebc0000,log=0xeebd1000,size=0x00020000}
+  reg[1]={io,phy=0x0000c000,size=0x00000040}
+PCI address space={base=0xfc000000,top=0xfebf1000}
+Setting up this machine as follows:
+  Processor:    IA32 at 1597 MHz (BUS clock = 125 MHz)
+  Memory:       262144 Kbytes [0x00000000:0x10000000]
+  User memory:  261704 Kbytes [0x00000000:0x0ff92000]
+  PCI aperture: 45064 Kbytes [0xfc000000:0xfec02000]
+  Node Id:      will get from the network!
+  Setup:        34976 bytes
+  Init:         22000 bytes
+  OS code:      91520 bytes	data: 640 bytes	stack: 16384 bytes
+  APP code:     7056 bytes	data: 16797696 bytes
+IDT[0  ]={sel=1,off=0x801004f0,p=1,dpl=3,d=0} (0x801004f0)
+IDT[255]={sel=1,off=0x801004f0,p=1,dpl=3,d=0} (0x801004f0)
+GDT[NULL=0]={bas=0x00000000,lim=0x00000000,p=0,dpl=0,s=0,typ=0,g=0,d=0,a=0}
+GDT[SYCD=1]={bas=0x00000000,lim=0x000fffff,p=1,dpl=0,s=1,typ=11,g=1,d=1,a=0}
+GDT[SYDT=2]={bas=0x00000000,lim=0x000fffff,p=1,dpl=0,s=1,typ=3,g=1,d=1,a=0}
+GDT[APCD=3]={bas=0x00000000,lim=0x000fffff,p=1,dpl=3,s=1,typ=11,g=1,d=1,a=0}
+GDT[APDT=4]={bas=0x00000000,lim=0x000fffff,p=1,dpl=3,s=1,typ=3,g=1,d=1,a=0}
+GDT[TSS0=5]={bas=0xff405000,lim=0x00000fff,p=1,dpl=3,s=0,typ=9,g=0,d=0,a=0}
+SPT={
+[0]=0x0ffff023  [1]=0x0fffe023  [2]=0x0fffd023  [3]=0x0fffc023
+[4]=0x0fffb023  [5]=0x0fffa023  [768]=0x0ff97023  [769]=0x0ff98023
+[770]=0x0ff99023  [771]=0x0ff9a023  [772]=0x0ff9b023  [773]=0x0ff9c023
+[774]=0x0ff9d023  [775]=0x0ff9e023  [776]=0x0ff9f023  [777]=0x0ffa0023
+[778]=0x0ffa1023  [779]=0x0ffa2023  [780]=0x0ffa3023  [781]=0x0ffa4023
+[782]=0x0ffa5023  [783]=0x0ffa6023  [784]=0x0ffa7023  [785]=0x0ffa8023
+[786]=0x0ffa9023  [787]=0x0ffaa023  [788]=0x0ffab023  [789]=0x0ffac023
+[790]=0x0ffad023  [832]=0x0ff96023  [960]=0x0ff92023  [961]=0x0ff93023
+[962]=0x0ff94023  [963]=0x0ff95023
+}
+SPD={
+[0]=0x0ffba027  [1]=0x0ffbb027  [2]=0x0ffbc027  [3]=0x0ffbd027
+[4]=0x0ffbe027  [5]=0x0ffbf027  [6]=0x0ffc0027  [7]=0x0ffc1027
+[8]=0x0ffc2027  [9]=0x0ffc3027  [10]=0x0ffc4027  [11]=0x0ffc5027
+[12]=0x0ffc6027  [13]=0x0ffc7027  [14]=0x0ffc8027  [15]=0x0ffc9027
+[16]=0x0ffca027  [17]=0x0ffcb027  [18]=0x0ffcc027  [19]=0x0ffcd027
+[20]=0x0ffce027  [21]=0x0ffcf027  [22]=0x0ffd0027  [23]=0x0ffd1027
+[24]=0x0ffd2027  [25]=0x0ffd3027  [26]=0x0ffd4027  [27]=0x0ffd5027
+[28]=0x0ffd6027  [29]=0x0ffd7027  [30]=0x0ffd8027  [31]=0x0ffd9027
+[32]=0x0ffda027  [33]=0x0ffdb027  [34]=0x0ffdc027  [35]=0x0ffdd027
+[36]=0x0ffde027  [37]=0x0ffdf027  [38]=0x0ffe0027  [39]=0x0ffe1027
+[40]=0x0ffe2027  [41]=0x0ffe3027  [42]=0x0ffe4027  [43]=0x0ffe5027
+[44]=0x0ffe6027  [45]=0x0ffe7027  [46]=0x0ffe8027  [47]=0x0ffe9027
+[48]=0x0ffea027  [49]=0x0ffeb027  [50]=0x0ffec027  [51]=0x0ffed027
+[52]=0x0ffee027  [53]=0x0ffef027  [54]=0x0fff0027  [55]=0x0fff1027
+[56]=0x0fff2027  [57]=0x0fff3027  [58]=0x0fff4027  [59]=0x0fff5027
+[60]=0x0fff6027  [61]=0x0fff7027  [62]=0x0fff8027  [63]=0x0fff9027
+[512]=0x0ffba023  [513]=0x0ffbb023  [514]=0x0ffbc023  [515]=0x0ffbd023
+[516]=0x0ffbe023  [517]=0x0ffbf023  [518]=0x0ffc0023  [519]=0x0ffc1023
+[520]=0x0ffc2023  [521]=0x0ffc3023  [522]=0x0ffc4023  [523]=0x0ffc5023
+[524]=0x0ffc6023  [525]=0x0ffc7023  [526]=0x0ffc8023  [527]=0x0ffc9023
+[528]=0x0ffca023  [529]=0x0ffcb023  [530]=0x0ffcc023  [531]=0x0ffcd023
+[532]=0x0ffce023  [533]=0x0ffcf023  [534]=0x0ffd0023  [535]=0x0ffd1023
+[536]=0x0ffd2023  [537]=0x0ffd3023  [538]=0x0ffd4023  [539]=0x0ffd5023
+[540]=0x0ffd6023  [541]=0x0ffd7023  [542]=0x0ffd8023  [543]=0x0ffd9023
+[544]=0x0ffda023  [545]=0x0ffdb023  [546]=0x0ffdc023  [547]=0x0ffdd023
+[548]=0x0ffde023  [549]=0x0ffdf023  [550]=0x0ffe0023  [551]=0x0ffe1023
+[552]=0x0ffe2023  [553]=0x0ffe3023  [554]=0x0ffe4023  [555]=0x0ffe5023
+[556]=0x0ffe6023  [557]=0x0ffe7023  [558]=0x0ffe8023  [559]=0x0ffe9023
+[560]=0x0ffea023  [561]=0x0ffeb023  [562]=0x0ffec023  [563]=0x0ffed023
+[564]=0x0ffee023  [565]=0x0ffef023  [566]=0x0fff0023  [567]=0x0fff1023
+[568]=0x0fff2023  [569]=0x0fff3023  [570]=0x0fff4023  [571]=0x0fff5023
+[572]=0x0fff6023  [573]=0x0fff7023  [574]=0x0fff8023  [575]=0x0fff9023
+[960]=0x0ffae833  [961]=0x0ffaf833  [962]=0x0ffb0833  [963]=0x0ffb1833
+[964]=0x0ffb2833  [965]=0x0ffb3833  [966]=0x0ffb4833  [967]=0x0ffb5833
+[968]=0x0ffb6833  [969]=0x0ffb7833  [970]=0x0ffb8833  [971]=0x0ffb9833
+[1021]=0x0fffd023
+}
+IP=0x00104211
+SP=0x00109efc
+CR0=0x00000011
+CR3=0x00000000
+TR=40,TSS0={ss0=16,esp0=0xff7c4000}
+IP=0x0010437b
+SP=0x00109efc
+CR0=0x80000011
+CR3=0x0fffc000
+
+System_Info={
+	Boot_Map={n_cpus=1,mem_base=0x00000000,mem_top=0x10000000,io_base=0x00000000,io_
+	top=0x00000000,node_id=-1,img_size=158132,setup_offset=0x200,init_offset=0x8b68,
+	system_offset=0xe340,application_offset=0x24be8,extras_offset=-1}
+
+	Physical_Memory_Map={
+	mem_base=0x00000000,
+	mem_top=0x0ff92000,
+
+	io_base=0xfc000000,
+	io_top=0xfec02000,
+	ext_base=0x00000000,
+	ext_top=0x00000000,
+	idt=0x0ffff000,
+
+	gdt=0x0fffe000,
+
+	sys_pt=0x0fffd000,
+	sys_pd=0x0fffc000,
+	sys_info=0x0fffb000,
+
+	phy_mem_pts=0x0ffba000,
+	io_pts=0x0ffae000,
+
+	sys_code=0x0ff97000,
+	sys_data=0x0ff96000,
+	sys_stack=0x0ff92000,
+
+	free1_base=0x00002000,
+	free1_top=0x000a0000,
+	free2_base=0x00100000,
+	free2_top=0x00400000,
+	free3_base=0x01405000,
+	free3_top=0x0ff92000
+	}
+
+	Load_Map={
+	has_stp=1,
+	has_ini=1,
+	has_sys=1,
+	has_app=1,
+	has_ext=0,
+
+	stp_entry=0x00100000,
+	stp_segments=1,
+	stp_code=0x00100000,
+	stp_code_size=34976,
+	stp_data=0xffffffff,
+	stp_data_size=0,
+
+	ini_entry=0x00200000,
+	ini_segments=1,
+	ini_code=0x00200000,
+	ini_code_size=22000,
+	ini_data=0xffffffff,
+	ini_data_size=0,
+
+	sys_entry=0xff700000,
+	sys_segments=2,
+	sys_code=0xff700000,
+	sys_code_size=91520,
+	sys_data=0xff740000,
+	sys_data_size=640,
+	sys_stack=0xff7c0000,
+	sys_stack_size=16384,
+
+	app_entry=0x00000040,
+	app_segments=0,
+	app_code=0x00000000,
+	app_code_size=7056,
+	app_data=0x00400000,
+	app_stack=0x00401000,
+	app_heap=0x00405000,
+	app_data_size=16797696,
+	app_extra=0x01010101,
+	app_extra_size=16843009
+	}
+
+Time_Map={cpu_clock=1597506880,bus_clock=125063360}}
+SETUP ends here!
+Initializing the CPU:
+IA32_MMU::memory={base=0x00000000,size=262144KB}
+IA32_MMU::free1={base=0x00002000,size=632KB}
+IA32_MMU::free2={base=0x00100000,size=3072KB}
+IA32_MMU::free3={base=0x01405000,size=241204KB}
+List[0xff740268]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff740268]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff740268]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff740268]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::tail=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::tail=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::tail=0x80002000 => {p=0x00000000,o=0x00002000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x80100000 => {p=0x80002000,o=0x00100000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x80100000 => {p=0x80002000,o=0x00100000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x81405000 => {p=0x80100000,o=0x01405000,n=0x00000000}
+IA32_MMU::master page directory=0x0fffc000
+done!
+Initializing system's heap:
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x81405000 => {p=0x80100000,o=0x01405000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x81405000 => {p=0x80100000,o=0x01405000,n=0x00000000}
+List[0xff7400f4]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff7400f4]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff7400f4]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff7400f4]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+done!
+Initializing the machine:
+done!
+Initializing system abstractions:
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x81405000 => {p=0x80100000,o=0x01405000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff740268]::head=0x80002000 => {p=0x00000000,o=0x00002000,n=0x80100000}
+List[0xff740268]::tail=0x81405000 => {p=0x80100000,o=0x01405000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+done!
+Randomizing the Random Numbers Generator'[000;079H
+[055;041Hs seed:
+done!
+INIT ends h[000;079H
+[057;011Here!
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0x[000;079H
+[061;025Hff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+Task::insert(Thread * t): 0 == 0
+Task::insert(Thread * t): 1 == 1
+[000;079H
+[066;000H[000;079H
+[066;000HList[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::head=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+List[0xff7400f4]::tail=0xff800000 => {p=0x00000000,o=0xff800000,n=0x00000000}
+Task::insert(Thread * t): 1 == 0
+Task::insert(Thread * t): 2 == 1
+List[0xff74013c]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff74013c]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0xff74013c]::head=0xff83ff10 => {p=0x00000000,o=0xff83fefc,n=0x00000000}
+List[0xff74013c]::tail=0xff83ff10 => {p=0x00000000,o=0xff83fefc,n=0x00000000}
+[000;079H
+[076;000HDispatching the first thread: 0xff843f3c
+Initializing application's heap:
+List[0x00400021]::head=0x00000000 => {p=0xffffffff,o=[000;079H
+[078;053H0xffffffff,n=0xffffffff}
+List[0x00400021]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0x00400021]::head=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+Li[000;079H
+[081;002Hst[0x00400021]::tail=0x00000000 => {p=0xffffffff,o=0xffffffff,n=0xffffffff}
+List[0x00400021]::head=0x00405000 => {p=0x00000000,o=0x00405000,n=0x00000000}
+List[0x00400021]::tail=0x00405000 => {p=0x00000000,o=0x00405000,n=0x00000000}
+List[0x00400021]::head=0x00405000 => {p=0x00000000,o=0x00405000,n=0x000[000;079H	[084;071H00000[000;079H
+[084;076H}
+List[0x00400021]::tail=0x00405000 => {p=0x00000000,o=0x00405000,n=0x00000000}
+done!

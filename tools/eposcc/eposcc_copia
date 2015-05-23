@@ -51,13 +51,6 @@ CPP_LINK_FLGS=
 CPP_LINK_OBJS=
 CPP_LINK_LIBS=
 
-F77_COMPILER="$TOOLS_PREFIX""g77"
-F77_COMP_FLGS=
-F77_COMP_HDRS=
-F77_LINK_FLGS=
-F77_LINK_OBJS=
-F77_LINK_LIBS="f2c"
-
 LINKER="$TOOLS_PREFIX""ld"
 
 LINKER_LIBRARY=$LINKER
@@ -82,7 +75,7 @@ LINK_LIBS_KERNEL="util_$ARCH arch_$ARCH gcc"
 # VARIABLES
 #=========================================================================
 do_exec=eval
-do_echo=echo
+do_echo=:
 need_link=1
 need_compile=0
 need_trace=0
@@ -144,14 +137,6 @@ for arg in "$@" ; do
 	need_link=0
 	need_compile=0
 	;;
-    --linux)
-	if [ $os_is_kernel = 1 -o $os_is_library = 1 -o $os_is_builtin = 1 ] ; then
-           echo "--builtin, --kernel, --library and --linux cannot be used together!"
-           exit -1
-	else
-	   os_is_linux=1
-	fi
-	;;
     --builtin)
 	if [ $os_is_kernel = 1 -o $os_is_library = 1 -o $os_is_linux = 1 ] ; then
 	    echo "--builtin, --kernel, --library and --linux cannot be used together!"
@@ -166,14 +151,6 @@ for arg in "$@" ; do
 	    exit -1
 	else
    	    os_is_library=1
-	fi
-	;;
-    --kernel)
-	if [ $os_is_library = 1 -o $os_is_builtin = 1 -o $os_is_linux = 1 ] ; then
-	    echo "--builtin, --kernel, --library and --linux cannot be used together!"
-	    exit -1
-	else
-	    os_is_kernel=1
 	fi
 	;;
     --trace)
@@ -256,18 +233,7 @@ done
 #=========================================================================
 # COMMAND ISSUING
 #=========================================================================
-if [ "$language" = "F77" ] ; then
-    compiler=$F77_COMPILER
-    compile_flgs="$compile_flgs $F77_COMP_FLGS"
-    for hdr in $F77_COMP_HDRS ; do
-	compile_flgs="$compile_flgs -I$hdr"
-    done
-    link_flgs="$link_flgs $F77_LINK_FLGS"
-    link_objs="$F77_LINK_OBJS $link_objs"
-    for lib in $F77_LINK_LIBS ; do
-	link_libs="$link_libs -l$lib"
-    done
-elif [ "$language" = "CPP" ] ; then
+if [ "$language" = "CPP" ] ; then
     compiler=$CPP_COMPILER
     compile_flgs="$compile_flgs $CPP_COMP_FLGS"
     for hdr in $CPP_COMP_HDRS ; do
@@ -278,18 +244,9 @@ elif [ "$language" = "CPP" ] ; then
     for lib in $CPP_LINK_LIBS ; do
 	link_libs="$link_libs -l$lib"
     done
-else
-    compiler=$C_COMPILER
-    compile_flgs="$compile_flgs $C_COMP_FLGS"
-    for hdr in $C_COMP_HDRS ; do
-	compile_flgs="$compile_flgs -I$hdr"
-    done
-    link_flgs="$link_flgs $C_LINK_FLGS"
-    link_objs="$C_LINK_OBJS $link_objs"
-    for lib in $C_LINK_LIBS ; do
-	link_libs="$link_libs -l$lib"
-    done
 fi
+
+// Adiciona todos os .h para compilar
 
 compile_flgs="$compile_flgs $COMP_FLGS"
 for hdr in $COMP_HDRS ; do

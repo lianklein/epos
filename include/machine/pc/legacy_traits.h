@@ -58,7 +58,7 @@ template<> struct Traits<PC_PCI>: public Traits<PC_Common>
 
 template<> struct Traits<PC_IC>: public Traits<PC_Common>
 {
-    static const bool debugged = true;
+    static const bool debugged = hysterically_debugged;
 };
 
 template<> struct Traits<PC_Timer>: public Traits<PC_Common>
@@ -106,6 +106,13 @@ template<> struct Traits<PC_Display>: public Traits<PC_Common>
     static const int LINES = 25;
     static const int TAB_SIZE = 8;
     static const unsigned int FRAME_BUFFER_ADDRESS = 0xb8000;
+};
+
+template<> struct Traits<PC_Scratchpad>: public Traits<PC_Common>
+{
+    static const bool enabled = false;
+    static const unsigned int ADDRESS = Traits<PC_Display>::FRAME_BUFFER_ADDRESS;
+    static const unsigned int SIZE = Traits<PC_Display>::LINES * Traits<PC_Display>::COLUMNS;
 };
 
 __END_SYS

@@ -12,6 +12,7 @@
 #include "info.h"
 #include "memory_map.h"
 #include "ic.h"
+#include "scratchpad.h"
 
 __BEGIN_SYS
 
@@ -21,13 +22,13 @@ class PC: public Machine_Common
 
 private:
     static const bool smp = Traits<System>::multicore;
-    
+
     typedef CPU::Reg32 Reg32;
     typedef CPU::Log_Addr Log_Addr;
 
 public:
     PC() {}
-  
+
     static void delay(const RTC::Microsecond & time) {
         TSC::Time_Stamp end = TSC::time_stamp() + time * (TSC::frequency() / 1000000);
         while(end > TSC::time_stamp());
@@ -43,7 +44,7 @@ public:
     static void smp_init(unsigned int n_cpus) {
         if(smp) {
             _n_cpus = n_cpus;
-            APIC::remap(); 
+            APIC::remap();
         }
     };
 
